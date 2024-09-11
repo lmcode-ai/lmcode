@@ -26,7 +26,7 @@ const taskDescriptions = {
   },
   'Code Translation': {
     description: 'Translate code from one programming language to another.',
-    inputDescription: 'The input is a code snippet in the language you choose.',
+    inputDescription: 'The input is a code snippet in the source language.',
     outputDescription: 'The output should be the translated code snippet in the target language.',
     example: {
       language: 'python -> java',
@@ -42,6 +42,86 @@ const taskDescriptions = {
       language: 'javascript',
       input: `// Given a JavaScript function with errors:\n\nfunction greet(name) {\n  console.log("Hello, " + name);\n}\n\ngreet("World";`,
       output: `// Corrected function:\nfunction greet(name) {\n  console.log("Hello, " + name);\n}\n\ngreet("World");`,
+    },
+  },
+  'Clone Detection': {
+    description: 'Measure the semantic similarity between codes.',
+    inputDescription: 'The input is a pair of code snippets.',
+    outputDescription: 'The output should indicate whether the codes are semantically similar.',
+    example: {
+      language: 'python',
+      input: `def add(a, b):\n    return a + b\n\n# Code snippet 2:\ndef sum(a, b):\n    return a + b`,
+      output: `True`,
+    },
+  },
+  'Defect Detection': {
+    description: 'Identify whether a body of source code contains defects and correct them.',
+    inputDescription: 'The input is a code snippet with potential defects.',
+    outputDescription: 'The output should indicate whether the code contains defects and the code snippet with defects corrected.',
+    example: {
+      language: 'python',
+      input: `def is_even(n):\n    return n % 2 = 0`,  // Defect: should be '=='
+      output: `# Defect: should be '=='\n\ndef is_even(n):\n    return n % 2 == 0`,
+    },
+  },
+  'Cloze Test': {
+    description: 'Predict the masked token of a code.',
+    inputDescription: 'The input is a code snippet with a masked token.',
+    outputDescription: 'The output should be the predicted token.',
+    example: {
+      language: 'python',
+      input: `def max_of_two(a, b):\n    return a if a > b else __mask__`,  // Masked token
+      output: `def max_of_two(a, b):\n    return a if a > b else b`,
+    },
+  },
+  'Code Search': {
+    description: 'Find the most relevant code in a collection of codes according to a natural language query.',
+    inputDescription: 'The input is a natural language query and code snippets.',
+    outputDescription: 'The output should be the most relevant code snippet.',
+    example: {
+      language: 'python',
+      input: `# "Find a function to add two numbers"\n\ndef add(a, b):\n    return a + b\n\ndef subtract(a, b):\n    return a - b`,
+      output: `def add(a, b):\n    return a + b`,
+    },
+  },
+  'Text-to-Code Generation': {
+    description: 'Generate a code via a natural language description.',
+    inputDescription: 'The input is a natural language description of the code.',
+    outputDescription: 'The output should be the generated code.',
+    example: {
+      language: 'python',
+      input: `Create a function to check if a number is even`,
+      output: `def is_even(n):\n    return n % 2 == 0`,
+    },
+  },
+  'Code Summarization': {
+    description: 'Generate the natural language comment for a code.',
+    inputDescription: 'The input is a code snippet.',
+    outputDescription: 'The output should be a natural language comment.',
+    example: {
+      language: 'python',
+      input: `def add(a, b):\n    return a + b`,
+      output: `# This function returns the sum of two numbers`,
+    },
+  },
+  'Transpilation': {
+    description: 'Transpile code from one version of a language to another or between similar languages.',
+    inputDescription: 'The input is a code snippet in the source version or language.',
+    outputDescription: 'The output should be the transpiled code snippet in the target version or language.',
+    example: {
+      language: 'javascript (ES5 -> ES6)',
+      input: `function sum(a, b) {\n    return a + b;\n}`,
+      output: `const sum = (a, b) => a + b;`,
+    },
+  },
+  'Algorithm Explanation': {
+    description: 'Explain the algorithm used in the given code snippet.',
+    inputDescription: 'The input is a code snippet with an algorithm.',
+    outputDescription: 'The output should be a natural language explanation of the algorithm.',
+    example: {
+      input: '1',
+      output: '2',
+      code: `def fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)`,
     },
   },
 };
@@ -111,4 +191,3 @@ const TaskDescription = ({ task }) => {
 };
 
 export default TaskDescription;
-

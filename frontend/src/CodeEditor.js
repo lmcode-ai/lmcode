@@ -10,6 +10,12 @@ const languageExtensions = {
   Python: python,
   Java: java,
   C: cpp,
+  PyTorch: python,
+  TensorFlow: python,
+  Gaudi: python,
+  NumPy: python,
+  'Apple MLX': python,
+  Gemmini: cpp,
 };
 
 const Height = '300px';
@@ -22,7 +28,7 @@ const CodeEditor = ({ language, code, setCode }) => {
       doc: code,
       extensions: [
         basicSetup,
-        languageExtensions[language](),
+        languageExtensions[language] ? languageExtensions[language]() : languageExtensions['Python'](),
         quietlight,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
