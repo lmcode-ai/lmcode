@@ -1,4 +1,4 @@
-# Code-Arena
+# Bot Overflow
 
 ## Pre-requisites
 
@@ -8,10 +8,10 @@
 
 ## Installation
 
-1. Clone the repository
+1. Clone this repository
 
 ```bash
-git clone git@github.com:LysanderT/code-arena.git
+git clone git@github.com:bot-overflow/bot-overflow.git
 ```
 
 2. Install the required packages
@@ -29,7 +29,6 @@ REACT_APP_GEMINI_API_KEY=your_gemini_api_key
 4. Start the server
 
 ```bash
-cd code-arena &&
+cd bot-overflow/frontend &&
 npm start
 ```
-
