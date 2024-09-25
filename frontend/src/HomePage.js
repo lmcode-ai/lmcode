@@ -27,7 +27,7 @@ const HomePage = () => {
       return;
     }
 
-    if ((task !== 'Algorithm Explanation') && !code.trim()) {
+    if (!code.trim()) {
       setDialogMessage('Please enter some code before submitting.');
       setOpenDialog(true);
       return;
@@ -39,7 +39,7 @@ const HomePage = () => {
       language,
       sourceLanguage,
       targetLanguage,
-      content: task === 'Algorithm Explanation' ? '' : code,
+      content: code,
     };
 
     navigate('/result', { state: { taskDetails } });
@@ -101,9 +101,8 @@ const HomePage = () => {
         />
         <TaskSelection task={task} setTask={setTask} />
         <TaskDescription task={task} />
-        {task !== 'Algorithm Explanation' && (
           <>
-            {(task !== 'Code Translation' && task !== 'Transpilation') ? (
+            {(task !== 'Code Translation') ? (
               <LanguageSelection label="Choose Language" language={language} setLanguage={setLanguage} />
             ) : (
               <>
@@ -111,15 +110,8 @@ const HomePage = () => {
                 <LanguageSelection label="Target Language" language={targetLanguage} setLanguage={setTargetLanguage} />
               </>
             )}
-            <CodeEditor language={task === 'Code Translation' || task === 'Transpilation' ? sourceLanguage : language} code={code} setCode={setCode} />
+            <CodeEditor language={task === 'Code Translation' ? sourceLanguage : language} code={code} setCode={setCode} />
           </>
-        )}
-        {task === 'Algorithm Explanation' && (
-          <>
-            <CodeEditor language="python" code={code} setCode={setCode} />
-            <CodeEditor language="python" code={code} setCode={setCode} />
-          </>
-        )}
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Submit
         </Button>
