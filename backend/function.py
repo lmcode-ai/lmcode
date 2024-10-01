@@ -2,6 +2,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer
 from config import config
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 def insert_question(title, content, language, source_language, target_language, task) -> int:
@@ -83,40 +87,39 @@ def get_answers_from_models(content, language, source_language, target_language,
                 "content": f"{prompt_user[task].format(language=language, source_language=source_language, target_language=target_language)}: {content}"
             }
         ]
-        # Check if the source is valid
-        if source in config.LLM_CLIENT:
-            for model in models:
-                try:
-                    print("here6")
-                    # Initialize the LLM client
-                    if source == "OPENAI":
-                        api_key = config.OPENAI_API_KEY  
-                        llm_client = config.LLM_CLIENT[source](api_key=api_key, model=model, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
-                    elif source == "ANTHROPIC":
-                        api_key = config.ANTHROPIC_API_KEY
-                        llm_client = config.LLM_CLIENT[source](api_key=api_key, model=model, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
-                    elif source == "HF":
-                        api_key = config.HF_API_KEY
-                        llm_client = config.LLM_CLIENT[source](repo_id=model, api_key=api_key, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
-                    elif source == "GEMINI":
-                        api_key = config.GEMINI_API_KEY
-                        llm_client = config.LLM_CLIENT[source](model=model, google_api_key=api_key, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
 
-                    # Make the LLM call
-                    llm_response = llm_client.invoke(messages)
+        for model in models:
+            try:
+                # Initialize the LLM client
+                if source == "OPENAI":
+                    llm_client = ChatOpenAI(openai_api_key=config.OPENAI_API_KEY, model=model)
+                elif source == "ANTHROPIC":
+                    llm_client = ChatAnthropic(anthropic_api_key=config.ANTHROPIC_API_KEY, model=model)
+                elif source == "HF":
+                    llm = HuggingFaceEndpoint(
+                        repo_id=model,
+                        task="text-generation",
+                        huggingfacehub_api_token=config.HF_API_KEY
+                    )
+                    llm_client = ChatHuggingFace(llm=llm)
+                elif source == "GEMINI":
+                    llm_client = ChatGoogleGenerativeAI(google_api_key=config.GEMINI_API_KEY, model=model)
 
-                    answer = llm_response.content
-                    response = {}
+                # Make the LLM call
+                llm_response = llm_client.invoke(messages)
 
-                    answer_id = insert_answer(answer, model, question_id)
-                    response['model'] = model
-                    response['answer'] = answer
-                    response['answer_id'] = answer_id
-                    responses.append(response)
+                answer = llm_response.content
+                response = {}
+
+                answer_id = insert_answer(answer, model, question_id)
+                response['model'] = model
+                response['answer'] = answer
+                response['answer_id'] = answer_id
+                responses.append(response)
 
 
-                except Exception as e:
-                    print(f"Error with {source} model {model}: {e}")    
+            except Exception as e:
+                print(f"Error with {source} model {model}: {e}")    
 
     print("Response type:", type(responses))
     print("Response content:", responses)

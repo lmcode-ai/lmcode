@@ -1,7 +1,5 @@
 import os
 import yaml
-from langchain import OpenAI, Anthropic, HuggingFaceHub
-from langchain_google_genai import ChatGoogleGenerativeAI
 import warnings
 
 class Config:
@@ -32,20 +30,13 @@ class Config:
 
         # LLM settings
         self.LLM_DICT = {
-            "OPENAI": config_data.get('llm', {}).get('openai', ['gpt-4']),
-            "ANTHROPIC": config_data.get('llm', {}).get('anthropic', ['claude-2']),
-            "HF": config_data.get('llm', {}).get('hf', ['gpt2']),
-            "GEMINI": config_data.get('llm', {}).get('gemini', ['gemini-1.5-pro'])
+            "OPENAI": config_data.get('llm', {}).get('openai', []),
+            "ANTHROPIC": config_data.get('llm', {}).get('anthropic', []),
+            "HF": config_data.get('llm', {}).get('hf', []),
+            "GEMINI": config_data.get('llm', {}).get('gemini', [])
         }
         
         self.LLM_TIMEOUT = config_data.get('llm', {}).get('timeout', 60)
         self.LLM_RETRIES = config_data.get('llm', {}).get('retries', 3)
-
-        self.LLM_CLIENT = {
-            "OPENAI": OpenAI,
-            "ANTHROPIC": Anthropic,
-            "HF": HuggingFaceHub,
-            "GEMINI": ChatGoogleGenerativeAI,
-        }
 
 config = Config()
