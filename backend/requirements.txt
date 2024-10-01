@@ -4,3 +4,8 @@ Flask-Cors
 requests
 python-dotenv
 openai
+langchain
+anthropic
+langchain-google-genai
+langchain-community
+pyyaml

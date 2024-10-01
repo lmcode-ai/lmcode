@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer
-from openai import OpenAI
-import os
+from config import config
 
 
 def insert_question(title, content, language, source_language, target_language, task) -> int:
@@ -64,12 +63,6 @@ def get_answers_from_models(content, language, source_language, target_language,
     :param question_id: the id of the question
     :return:
     """
-
-    models = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o']
-    client = OpenAI()
-
-    responses = []
-
     prompt_user = {
         "Code Completion": "Complete the code snippet written in {language}",
         "Code Translation": "Translate the code snippet from {source_language} to {target_language}",
@@ -77,37 +70,58 @@ def get_answers_from_models(content, language, source_language, target_language,
         "Code Repair": "Fix the code snippet written in {language}"
     }
 
-    try:
-        # Create messages to send to the API
+    responses = []
+    
+    for source, models in config.LLM_DICT.items():
         messages = [
-            {"role": "system",
-             "content": f"You are a programming assistant skilled in different tasks like"
-                        f"code completion, translation, and explanation."},
-            {"role": "user",
-             "content": prompt_user[task].format(language=language, source_language=source_language, target_language=target_language) + f": {content}"}
+            {
+                "role": "system",
+                "content": "You are a programming assistant skilled in different tasks like code completion, translation, and explanation."
+            },
+            {
+                "role": "user",
+                "content": f"{prompt_user[task].format(language=language, source_language=source_language, target_language=target_language)}: {content}"
+            }
         ]
+        # Check if the source is valid
+        if source in config.LLM_CLIENT:
+            for model in models:
+                try:
+                    print("here6")
+                    # Initialize the LLM client
+                    if source == "OPENAI":
+                        api_key = config.OPENAI_API_KEY  
+                        llm_client = config.LLM_CLIENT[source](api_key=api_key, model=model, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
+                    elif source == "ANTHROPIC":
+                        api_key = config.ANTHROPIC_API_KEY
+                        llm_client = config.LLM_CLIENT[source](api_key=api_key, model=model, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
+                    elif source == "HF":
+                        api_key = config.HF_API_KEY
+                        llm_client = config.LLM_CLIENT[source](repo_id=model, api_key=api_key, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
+                    elif source == "GEMINI":
+                        api_key = config.GEMINI_API_KEY
+                        llm_client = config.LLM_CLIENT[source](model=model, google_api_key=api_key, max_retries=config.LLM_RETRIES, timeout=config.LLM_TIMEOUT)
 
-        # Iterate through the list of models and get responses
-        for model in models:
-            completion = client.chat.completions.create(
-                model=model,
-                messages=messages
-            )
-            answer = completion.choices[0].message.content
-            response = {}
-            answer_id = insert_answer(answer, model, question_id)
-            response['model'] = model
-            response['answer'] = answer
-            response['answer_id'] = answer_id
-            responses.append(response)
+                    # Make the LLM call
+                    llm_response = llm_client.invoke(messages)
 
-        print("Response type:", type(responses))
-        print("Response content:", responses)
+                    answer = llm_response.content
+                    response = {}
 
-        return responses
+                    answer_id = insert_answer(answer, model, question_id)
+                    response['model'] = model
+                    response['answer'] = answer
+                    response['answer_id'] = answer_id
+                    responses.append(response)
 
-    except Exception as e:
-        raise Exception("Error in get_answers_from_models:", str(e))
+
+                except Exception as e:
+                    print(f"Error with {source} model {model}: {e}")    
+
+    print("Response type:", type(responses))
+    print("Response content:", responses)
+        
+    return responses
 
 
 def update_answer(answer_id: int, upvote_i, downvote_i) -> None:
