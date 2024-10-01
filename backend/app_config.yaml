@@ -3,7 +3,7 @@ database:
   track_modifications: false
 
 api_keys:
-  openai_api_key: "YOUR_OPENAI_API_KEY"
+  openai_api_key: "sk-ii118tH08VLWdLka-KkMmHOg3-umNyTPbdqXh4mcPbT3BlbkFJnF24It0qH7SbvG_baWV0X1PMNVbGeeSJgFU8fjbzEA"
   gemini_api_key: "YOUR_GEMINI_API_KEY"
   anthropic_api_key: "YOUR_ANTHROPIC_API_KEY"
   hf_api_key: "YOUR_HF_API_KEY"
