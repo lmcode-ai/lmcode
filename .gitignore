@@ -25,5 +25,4 @@ yarn-error.log*
 # React Component Preview
 previewConfig.json
 
-backend/app_config.yaml
 backend/__pycache__
