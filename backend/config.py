@@ -7,11 +7,9 @@ from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain.chains import LLMChain
 
 class Config:
-    def __init__(self, config_file='app_config.yaml', api_key_config_file='app_api_key_config.yaml'):
+    def __init__(self, config_file='app_config.yaml'):
         # Load the YAML file
         with open(config_file, 'r') as file:
             config_data = yaml.safe_load(file)
