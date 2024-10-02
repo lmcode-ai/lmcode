@@ -9,4 +9,5 @@ langchain-google-genai
 langchain-community
 langchain_huggingface
 langchain_openai
-dotenv
+python-dotenv
+anthropic
