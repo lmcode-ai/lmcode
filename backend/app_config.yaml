@@ -2,13 +2,6 @@ database:
   uri: "sqlite:///app.db"
   track_modifications: false
 
-api_keys:
-  openai_api_key: "YOUR_OPENAI_API_KEY"
-  gemini_api_key: "YOUR_GEMINI_API_KEY"
-  anthropic_api_key: "YOUR_ANTHROPIC_API_KEY"
-  hf_api_key: "YOUR_HUGGING_FACE_API_KEY"
-
-
 llm:
   openai:
     - "gpt-4o"
