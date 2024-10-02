@@ -2,10 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer
 from config import config
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
-from langchain_openai import ChatOpenAI
-from langchain_community.chat_models import ChatAnthropic
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.runnables import RunnableParallel
 
 
 def insert_question(title, content, language, source_language, target_language, task) -> int:
@@ -67,61 +64,31 @@ def get_answers_from_models(content, language, source_language, target_language,
     :param question_id: the id of the question
     :return:
     """
-    # These should be consistent with frontend passing in
-    prompt_user = {
-        "Code Completion": "Complete the code snippet written in {language}",
-        "Code Translation": "Translate the code snippet from {source_language} to {target_language}",
-        "Code Repair": "Fix the code snippet written in {language}",
-        "Text-to-Code Generation": "Follow the instruction to write a code snippet in {language}",
-        "Code Summarization": "Explain the code snippet written in {language}",
-    }
-
-    responses = []
     
-    for source, models in config.LLM_DICT.items():
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a programming assistant skilled in different tasks like code completion, translation, and explanation."
-            },
-            {
-                "role": "user",
-                "content": f"{prompt_user[task].format(language=language, source_language=source_language, target_language=target_language)}: {content}"
-            }
-        ]
+    responses = []
+    task_template = config.TASK_PROMPTS[task]
 
-        for model in models:
-            try:
-                # Initialize the LLM client
-                if source == "OPENAI":
-                    llm_client = ChatOpenAI(openai_api_key=config.OPENAI_API_KEY, model=model)
-                elif source == "ANTHROPIC":
-                    llm_client = ChatAnthropic(anthropic_api_key=config.ANTHROPIC_API_KEY, model=model)
-                elif source == "HF":
-                    llm = HuggingFaceEndpoint(
-                        repo_id=model,
-                        task="text-generation",
-                        huggingfacehub_api_token=config.HF_API_KEY
-                    )
-                    llm_client = ChatHuggingFace(llm=llm)
-                elif source == "GEMINI":
-                    llm_client = ChatGoogleGenerativeAI(google_api_key=config.GEMINI_API_KEY, model=model)
+    # Gather input data to chain
+    input_data = {}
+    if task == "Code Translation":
+        input_data["source_language"] = language
+        input_data["target_language"] = language
+        input_data["content"] = content
+    else:
+        input_data["language"] = language
+        input_data["content"] = content
+    # Run all chain in parallel
+    parallel_runnable = task_template | config.LLM_CHAINS
+    llm_responses = parallel_runnable.invoke(input_data)
+    for model, llm_response in llm_responses.items():
+        answer = llm_response.content
 
-                # Make the LLM call
-                llm_response = llm_client.invoke(messages)
-
-                answer = llm_response.content
-                response = {}
-
-                answer_id = insert_answer(answer, model, question_id)
-                response['model'] = model
-                response['answer'] = answer
-                response['answer_id'] = answer_id
-                responses.append(response)
-
-
-            except Exception as e:
-                print(f"Error with {source} model {model}: {e}")    
+        response = {}
+        answer_id = insert_answer(answer, model, question_id)
+        response['model'] = model
+        response['answer'] = answer
+        response['answer_id'] = answer_id
+        responses.append(response)
 
     print("Response type:", type(responses))
     print("Response content:", responses)

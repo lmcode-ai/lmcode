@@ -2,6 +2,13 @@ import os
 import yaml
 import warnings
 from dotenv import load_dotenv
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.chains import LLMChain
 
 class Config:
     def __init__(self, config_file='app_config.yaml', api_key_config_file='app_api_key_config.yaml'):
@@ -41,5 +48,43 @@ class Config:
         
         self.LLM_TIMEOUT = config_data.get('llm', {}).get('timeout', 60)
         self.LLM_RETRIES = config_data.get('llm', {}).get('retries', 3)
+
+
+        # These should be consistent with frontend passing in
+        system_prompt = ("system", "You are a programming assistant skilled in different tasks like code completion, translation, and explanation.")
+        self.TASK_PROMPTS = {
+            "Code Completion": ChatPromptTemplate([system_prompt, ("human", "Complete the code snippet written in {language}:\n{content}")]),
+            "Code Translation": ChatPromptTemplate([system_prompt, ("human", "Translate the code snippet from {source_language} to {target_language}:\n{content}")]),
+            "Code Repair": ChatPromptTemplate([system_prompt, ("human", "Fix the code snippet written in {language}:\n{content}")]),
+            "Text-to-Code Generation": ChatPromptTemplate([system_prompt, ("human", "Follow the instruction to write a code snippet in {language}:\n{content}")]),
+            "Code Summarization": ChatPromptTemplate([system_prompt, ("human", "Explain the code snippet written in {language}:\n{content}")]),
+        }
+
+        # setup all client chains
+        self.LLM_CHAINS = {} # dict of model name to llm
+
+        for source, models in self.LLM_DICT.items():
+            for model in models:
+                try:
+                    # Initialize the LLM client
+                    if source == "OPENAI":
+                        llm_client = ChatOpenAI(openai_api_key=self.OPENAI_API_KEY, model=model)
+                    elif source == "ANTHROPIC":
+                        llm_client = ChatAnthropic(anthropic_api_key=self.ANTHROPIC_API_KEY, model=model)
+                    elif source == "HF":
+                        llm = HuggingFaceEndpoint(
+                            repo_id=model,
+                            task="text-generation",
+                            huggingfacehub_api_token=self.HF_API_KEY
+                        )
+                        llm_client = ChatHuggingFace(llm=llm)
+                    elif source == "GEMINI":
+                        llm_client = ChatGoogleGenerativeAI(google_api_key=self.GEMINI_API_KEY, model=model)
+                    llm_client.invoke("Sanity test")
+                    self.LLM_CHAINS[model] = llm_client
+                    print(f"Successfully added {source} model {model}")
+                except Exception as e:
+                    print(f"Error with {source} model {model}: {e}")   
+        
 
 config = Config()
