@@ -53,7 +53,12 @@ conda activate env_name_here
 pip install -r bot-overflow/backend/requirements.txt 
 ```
 
-4. Add api key in bot-overflow/backend/app_api_key_config.yaml file
+4. To setup environment variables. Copy the `.env.example` file and create a `.env` file in the backend directory of the project and insert actual API keys there.
+
+```bash
+cp .env.example .env
+#modify .env with actual values
+```
 
 5. Start the server
 

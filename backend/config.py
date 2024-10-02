@@ -1,6 +1,7 @@
 import os
 import yaml
 import warnings
+from dotenv import load_dotenv
 
 class Config:
     def __init__(self, config_file='app_config.yaml', api_key_config_file='app_api_key_config.yaml'):
@@ -8,18 +9,17 @@ class Config:
         with open(config_file, 'r') as file:
             config_data = yaml.safe_load(file)
 
-        with open(api_key_config_file, 'r') as file:
-            api_config_data = yaml.safe_load(file)
+        load_dotenv()
 
         # Database settings
         self.SQLALCHEMY_DATABASE_URI = config_data.get('database', {}).get('uri', os.getenv('DATABASE_URL', 'sqlite:///app.db'))
         self.SQLALCHEMY_TRACK_MODIFICATIONS = config_data.get('database', {}).get('track_modifications', False)
 
         # API Keys
-        self.OPENAI_API_KEY = api_config_data.get('api_keys', {}).get('openai_api_key', os.getenv('OPENAI_API_KEY'))
-        self.ANTHROPIC_API_KEY = api_config_data.get('api_keys', {}).get('anthropic_api_key', os.getenv('ANTHROPIC_API_KEY'))
-        self.HF_API_KEY = api_config_data.get('api_keys', {}).get('hf_api_key', os.getenv('HF_API_KEY'))
-        self.GEMINI_API_KEY = api_config_data.get('api_keys', {}).get('gemini_api_key', os.getenv('GEMINI_API_KEY'))
+        self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+        self.ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+        self.HF_API_KEY = os.getenv('HF_API_KEY')
+        self.GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
         # Check if any API key is missing and issue a warning
         if not self.OPENAI_API_KEY:
