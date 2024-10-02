@@ -67,11 +67,13 @@ def get_answers_from_models(content, language, source_language, target_language,
     :param question_id: the id of the question
     :return:
     """
+    # These should be consistent with frontend passing in
     prompt_user = {
         "Code Completion": "Complete the code snippet written in {language}",
         "Code Translation": "Translate the code snippet from {source_language} to {target_language}",
-        "Code Explanation": "Explain the code snippet written in {language}",
-        "Code Repair": "Fix the code snippet written in {language}"
+        "Code Repair": "Fix the code snippet written in {language}",
+        "Text-to-Code Generation": "Follow the instruction to write a code snippet in {language}",
+        "Code Summarization": "Explain the code snippet written in {language}",
     }
 
     responses = []

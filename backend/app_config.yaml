@@ -3,10 +3,10 @@ database:
   track_modifications: false
 
 api_keys:
-  openai_api_key: "sk-ii118tH08VLWdLka-KkMmHOg3-umNyTPbdqXh4mcPbT3BlbkFJnF24It0qH7SbvG_baWV0X1PMNVbGeeSJgFU8fjbzEA"
+  openai_api_key: "YOUR_OPENAI_API_KEY"
   gemini_api_key: "YOUR_GEMINI_API_KEY"
   anthropic_api_key: "YOUR_ANTHROPIC_API_KEY"
-  hf_api_key: "YOUR_HF_API_KEY"
+  hf_api_key: "YOUR_HUGGING_FACE_API_KEY"
 
 
 llm:
@@ -15,7 +15,8 @@ llm:
   anthropic:
     - "claude-2"
   hf:
-    - "gpt2"
+    - "deepseek-ai/DeepSeek-Coder-V2-Instruct"
+    - "codellama/CodeLlama-34b-Instruct-hf"
   gemini:
     - "gemini-1.5-pro"
   timeout: 60

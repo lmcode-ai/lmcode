@@ -57,7 +57,6 @@ def handle_questions():
     return the related information of each answer {model, answer, answer_id}
     invoke this when the page is directed to the result page.
     """
-    print("here")
     try:
         data = request.get_json()
         question_title = data.get('title')
@@ -68,6 +67,7 @@ def handle_questions():
         task = data.get('task')
         question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task)
         response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
+        # MOCK RESPONSE
         # response = [
         #     {
         #         'model': 'model 1',
