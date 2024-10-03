@@ -7,6 +7,9 @@ from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import ChatPromptTemplate
+from langchain_google_vertexai import ChatVertexAI
+from vertexai.preview import reasoning_engines
+import vertexai
 
 class Config:
     def __init__(self, config_file='app_config.yaml'):
@@ -37,12 +40,23 @@ class Config:
             warnings.warn("Hugging Face API key is missing! Some features may not work.")
 
         # LLM settings
+
         self.LLM_DICT = {
             "OPENAI": config_data.get('llm', {}).get('openai', []),
             "ANTHROPIC": config_data.get('llm', {}).get('anthropic', []),
             "HF": config_data.get('llm', {}).get('hf', []),
-            "GEMINI": config_data.get('llm', {}).get('gemini', [])
+            "GEMINI": config_data.get('llm', {}).get('gemini', []),
         }
+
+        google_ai_platform_config = config_data.get('google-ai-platform', {})
+        self.IS_GOOGLE_AI_PLATFORM = google_ai_platform_config.get('active', False)
+        self.GOOGLE_AI_PLATFORM_PROJECT_NAME = google_ai_platform_config.get('project', "")
+        self.GOOGLE_AI_PLATFORM_LOCATION = google_ai_platform_config.get('location', "")
+        if self.IS_GOOGLE_AI_PLATFORM:
+            vertexai.init(project=self.GOOGLE_AI_PLATFORM_PROJECT_NAME, location=self.GOOGLE_AI_PLATFORM_LOCATION)
+            print("Using Google AI Platform")
+        else:
+            print("Using Gemini through developer platform")
         
         self.LLM_TIMEOUT = config_data.get('llm', {}).get('timeout', 60)
         self.LLM_RETRIES = config_data.get('llm', {}).get('retries', 3)
@@ -77,7 +91,10 @@ class Config:
                         )
                         llm_client = ChatHuggingFace(llm=llm)
                     elif source == "GEMINI":
-                        llm_client = ChatGoogleGenerativeAI(google_api_key=self.GEMINI_API_KEY, model=model)
+                        if self.IS_GOOGLE_AI_PLATFORM:
+                            llm_client = ChatVertexAI(model=model)
+                        else: 
+                            llm_client = ChatGoogleGenerativeAI(google_api_key=self.GEMINI_API_KEY, model=model)
                     llm_client.invoke("Sanity test")
                     self.LLM_CHAINS[model] = llm_client
                     print(f"Successfully added {source} model {model}")

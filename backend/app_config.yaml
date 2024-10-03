@@ -13,3 +13,8 @@ llm:
     - "gemini-1.5-pro"
   timeout: 60
   retries: 3
+
+google-ai-platform:
+  cloud: false # controls to use environment api key for Gemini or not.
+  project: "lmcode"
+  location: "us-central1"
