@@ -15,6 +15,6 @@ llm:
   retries: 3
 
 google-ai-platform:
-  cloud: false # controls to use environment api key for Gemini or not.
+  active: false # controls to use environment api key for Gemini or not.
   project: "lmcode"
   location: "us-central1"
