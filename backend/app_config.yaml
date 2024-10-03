@@ -8,8 +8,7 @@ llm:
   anthropic:
     - "claude-2"
   hf:
-    - "deepseek-ai/DeepSeek-Coder-V2-Instruct"
-    - "codellama/CodeLlama-34b-Instruct-hf"
+    - "meta-llama/Llama-3.1-70B-Instruct"
   gemini:
     - "gemini-1.5-pro"
   timeout: 60
