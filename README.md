@@ -23,7 +23,7 @@ npm install
 3. Start the server
 
 ```bash
-cd bot-overflow/frontend &&
+cd lmcode/frontend &&
 npm start
 ```
 
@@ -32,7 +32,7 @@ npm start
 1. Clone this repository
 
 ```bash
-git clone git@github.com:bot-overflow/bot-overflow.git
+git clone git@github.com:lmcode-ai/lmcode.git
 ```
 
 2. Create a new conda environment (Optional)
@@ -44,7 +44,7 @@ conda activate env_name_here
 3. Install the required packages
 
 ```bash
-pip install -r bot-overflow/backend/requirements.txt 
+pip install -r lmcode/backend/requirements.txt 
 ```
 
 4. To setup environment variables. Copy the `.env.example` file and create a `.env` file in the backend directory of the project and insert actual API keys there.
@@ -57,6 +57,6 @@ cp .env.example .env
 5. Start the server
 
 ```bash
-cd bot-overflow/backend &&
+cd lmcode/backend &&
 flask run
 ```
