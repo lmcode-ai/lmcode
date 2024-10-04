@@ -25,6 +25,7 @@ class Question(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     accepted_answer_id = db.Column(db.Integer, db.ForeignKey('answer.id'), nullable=True)
     accepted_answer = db.relationship('Answer', foreign_keys=[accepted_answer_id], post_update=True)
+    ip_address = db.Column(db.String(45), nullable=True)
 
 
 class Answer(db.Model):

@@ -5,7 +5,7 @@ from config import config
 from langchain_core.runnables import RunnableParallel
 
 
-def insert_question(title, content, language, source_language, target_language, task) -> int:
+def insert_question(title, content, language, source_language, target_language, task, ip_address) -> int:
     """
     Add a question to the database
     :param title: the title of the question
@@ -23,7 +23,8 @@ def insert_question(title, content, language, source_language, target_language, 
         language=language,
         source_language=source_language,
         target_language=target_language,
-        task=task
+        task=task,
+        ip_address=ip_address
     )
 
     db.session.add(question)

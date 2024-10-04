@@ -58,6 +58,7 @@ def handle_questions():
     invoke this when the page is directed to the result page.
     """
     try:
+        ip_address = request.remote_addr
         data = request.get_json()
         question_title = data.get('title')
         question_content = data.get('content')
@@ -65,7 +66,7 @@ def handle_questions():
         source_language = data.get('sourceLanguage')
         target_language = data.get('targetLanguage')
         task = data.get('task')
-        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task)
+        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
         response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
         # MOCK RESPONSE
         # response = [
