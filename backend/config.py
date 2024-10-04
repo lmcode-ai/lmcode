@@ -27,6 +27,9 @@ class Config:
         self.SQLALCHEMY_TRACK_MODIFICATIONS = config_data.get("database", {}).get(
             "track_modifications", False
         )
+        self.SQLALCHEMY_FILENAME = config_data.get("database", {}).get(
+            "file_name", "app.db"
+        )
 
         # API Keys
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

@@ -1,4 +1,5 @@
 database:
+  file_name: "app.db"
   uri: "sqlite:///app.db"
   track_modifications: false
 

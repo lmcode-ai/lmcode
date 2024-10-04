@@ -3,19 +3,20 @@ from flask_cors import CORS
 from models import db, Language, Question, Answer, Feedback
 import os
 import function
+from config import config
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
 
     # Configuration for SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///code_arena.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI 
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
 
     with app.app_context():
-        db_path = os.path.join(app.instance_path, 'code_arena.db')
+        db_path = os.path.join(app.instance_path, config.SQLALCHEMY_FILENAME)
         if not os.path.exists(db_path):
             print("Creating database and tables...")
             db.create_all()
