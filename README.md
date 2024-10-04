@@ -1,4 +1,4 @@
-# Bot Overflow
+# LMCode website
 
 ## Pre-requisites
 
@@ -11,7 +11,7 @@
 1. Clone this repository
 
 ```bash
-git clone git@github.com:bot-overflow/bot-overflow.git
+git clone git@github.com:lmcode-ai/lmcode.git
 ```
 
 2. Install the required packages
