@@ -5,17 +5,25 @@ database:
 
 llm:
   openai:
-    - "gpt-4o"
+    - id: "gpt-4o"
+      name: "GPT-4o"
+      max_tokens: 500
   anthropic:
-    - "claude-3-5-sonnet-20240620"
+    - id: "claude-3-5-sonnet-20240620"
+      name: "Claude-3.5-sonnet"
+      max_tokens: 500
   hf:
-    - "meta-llama/Llama-3.1-70B-Instruct"
+    - id: "meta-llama/Llama-3.1-70B-Instruct"
+      name: "Llama-3.1"
+      max_tokens: 500
   gemini:
-    - "gemini-1.5-pro"
+    - id: "gemini-1.5-pro"
+      name: "Gemini-1.5-pro"
+      max_tokens: 500
   timeout: 60
   retries: 3
 
 google-ai-platform:
-  active: false # controls to use environment api key for Gemini or not.
+  active: false # controls to use environment api key for Gemini or not. False means use local Gemini Key; True means use Google AI Platform.
   project: "lmcode"
   location: "us-central1"

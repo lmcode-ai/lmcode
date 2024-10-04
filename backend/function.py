@@ -72,8 +72,8 @@ def get_answers_from_models(content, language, source_language, target_language,
     # Gather input data to chain
     input_data = {}
     if task == "Code Translation":
-        input_data["source_language"] = language
-        input_data["target_language"] = language
+        input_data["source_language"] = source_language
+        input_data["target_language"] = target_language
         input_data["content"] = content
     else:
         input_data["language"] = language
@@ -81,18 +81,15 @@ def get_answers_from_models(content, language, source_language, target_language,
     # Run all chain in parallel
     parallel_runnable = task_template | config.LLM_CHAINS
     llm_responses = parallel_runnable.invoke(input_data)
-    for model, llm_response in llm_responses.items():
+    for model_id, llm_response in llm_responses.items():
         answer = llm_response.content
 
         response = {}
-        answer_id = insert_answer(answer, model, question_id)
-        response['model'] = model
+        answer_id = insert_answer(answer, model_id, question_id)
+        response['model'] = config.LLM_ID_NAME[model_id]
         response['answer'] = answer
         response['answer_id'] = answer_id
         responses.append(response)
-
-    print("Response type:", type(responses))
-    print("Response content:", responses)
         
     return responses
 
