@@ -54,38 +54,42 @@ class Config:
         self.LLM_DICT = {
             "OPENAI": [
                 {
-                    "id": model.get('id'),
-                    "name": model.get('name'),
-                    "max_tokens": model.get('max_tokens', 1000) 
-                } for model in config_data.get("llm", {}).get("openai", [])
+                    "id": model.get("id"),
+                    "name": model.get("name"),
+                    "max_tokens": model.get("max_tokens", 1000),
+                }
+                for model in config_data.get("llm", {}).get("openai", [])
             ],
             "ANTHROPIC": [
                 {
-                    "id": model.get('id'),
-                    "name": model.get('name'),
-                    "max_tokens": model.get('max_tokens', 1000) 
-                } for model in config_data.get("llm", {}).get("anthropic", [])
+                    "id": model.get("id"),
+                    "name": model.get("name"),
+                    "max_tokens": model.get("max_tokens", 1000),
+                }
+                for model in config_data.get("llm", {}).get("anthropic", [])
             ],
             "HF": [
                 {
-                    "id": model.get('id'),
-                    "name": model.get('name'),
-                    "max_tokens": model.get('max_tokens', 1000)  
-                } for model in config_data.get("llm", {}).get("hf", [])
+                    "id": model.get("id"),
+                    "name": model.get("name"),
+                    "max_tokens": model.get("max_tokens", 1000),
+                }
+                for model in config_data.get("llm", {}).get("hf", [])
             ],
             "GEMINI": [
                 {
-                    "id": model.get('id'),
-                    "name": model.get('name'),
-                    "max_tokens": model.get('max_tokens', 1000) 
-                } for model in config_data.get("llm", {}).get("gemini", [])
-            ]
+                    "id": model.get("id"),
+                    "name": model.get("name"),
+                    "max_tokens": model.get("max_tokens", 1000),
+                }
+                for model in config_data.get("llm", {}).get("gemini", [])
+            ],
         }
 
         self.LLM_ID_NAME = {}
         for _, models in self.LLM_DICT.items():
             for model in models:
-                self.LLM_ID_NAME[model.get('id')] = model.get('name')
+                self.LLM_ID_NAME[model.get("id")] = model.get("name")
 
         google_ai_platform_config = config_data.get("google-ai-platform", {})
         self.IS_GOOGLE_AI_PLATFORM = google_ai_platform_config.get("active", False)
@@ -164,29 +168,40 @@ class Config:
                     # Initialize the LLM client
                     if source == "OPENAI":
                         llm_client = ChatOpenAI(
-                            openai_api_key=self.OPENAI_API_KEY, model=model.get('id'), max_tokens=model.get('max_tokens') 
+                            openai_api_key=self.OPENAI_API_KEY,
+                            model=model.get("id"),
+                            max_tokens=model.get("max_tokens"),
                         )
                     elif source == "ANTHROPIC":
                         llm_client = ChatAnthropic(
-                            anthropic_api_key=self.ANTHROPIC_API_KEY, model=model.get('id'), max_tokens_to_sample=model.get('max_tokens') 
+                            anthropic_api_key=self.ANTHROPIC_API_KEY,
+                            model=model.get("id"),
+                            max_tokens_to_sample=model.get("max_tokens"),
                         )
                     elif source == "HF":
                         llm = HuggingFaceEndpoint(
-                            repo_id=model.get('id'),
+                            repo_id=model.get("id"),
                             task="text-generation",
                             huggingfacehub_api_token=self.HF_API_KEY,
-                            max_new_tokens=model.get('max_tokens') ,
+                            max_new_tokens=model.get("max_tokens"),
                         )
-                        llm_client = ChatHuggingFace(llm=llm)
+                        llm_client = ChatHuggingFace(llm=llm).bind(
+                            max_tokens=model.get("max_tokens")
+                        )
                     elif source == "GEMINI":
                         if self.IS_GOOGLE_AI_PLATFORM:
-                            llm_client = ChatVertexAI(model=model.get('id'), max_tokens=model.get('max_tokens') )
+                            llm_client = ChatVertexAI(
+                                model=model.get("id"),
+                                max_tokens=model.get("max_tokens"),
+                            )
                         else:
                             llm_client = ChatGoogleGenerativeAI(
-                                google_api_key=self.GEMINI_API_KEY, model=model.get('id'), max_output_tokens=model.get('max_tokens') 
+                                google_api_key=self.GEMINI_API_KEY,
+                                model=model.get("id"),
+                                max_output_tokens=model.get("max_tokens"),
                             )
                     llm_client.invoke("Sanity test")
-                    self.LLM_CHAINS[model.get('id')] = llm_client
+                    self.LLM_CHAINS[model.get("id")] = llm_client
                     print(f"Successfully added {source} model {model.get('id')}")
                 except Exception as e:
                     print(f"Error with {source} model {model.get('id')}: {e}")
