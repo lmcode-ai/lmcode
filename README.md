@@ -14,9 +14,10 @@
 git clone git@github.com:lmcode-ai/lmcode.git
 ```
 
-2. Install the required packages
+2. Install the required packages for the frontend
 
 ```bash
+cd frontend
 npm install
 ```
 
