@@ -6,6 +6,7 @@ import ResultPage from './ResultPage';
 import SearchPage from './SearchPage';
 import AboutUsPage from './AboutUsPage';
 import DisclaimerPopup from './DisclaimerPopup';
+import Navbar from './NavBar';
 
 const GOOGLE_CLIENT_ID = '1011505161223-ajksarufqtl9iile2d3i25sg6jckegkb.apps.googleusercontent.com'; // Replace with your actual Google Client ID
 
@@ -15,6 +16,7 @@ function App() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <DisclaimerPopup />
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/result" element={<ResultPage />} />
