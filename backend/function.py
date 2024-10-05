@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer
-from openai import OpenAI
-import os
+from config import config
+from langchain_core.runnables import RunnableParallel
 
 
-def insert_question(title, content, language, source_language, target_language, task) -> int:
+def insert_question(title, content, language, source_language, target_language, task, ip_address) -> int:
     """
     Add a question to the database
     :param title: the title of the question
@@ -23,7 +23,8 @@ def insert_question(title, content, language, source_language, target_language, 
         language=language,
         source_language=source_language,
         target_language=target_language,
-        task=task
+        task=task,
+        ip_address=ip_address
     )
 
     db.session.add(question)
@@ -64,50 +65,33 @@ def get_answers_from_models(content, language, source_language, target_language,
     :param question_id: the id of the question
     :return:
     """
-
-    models = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o']
-    client = OpenAI()
-
+    
     responses = []
+    task_template = config.TASK_PROMPTS[task]
 
-    prompt_user = {
-        "Code Completion": "Complete the code snippet written in {language}",
-        "Code Translation": "Translate the code snippet from {source_language} to {target_language}",
-        "Code Explanation": "Explain the code snippet written in {language}",
-        "Code Repair": "Fix the code snippet written in {language}"
-    }
+    # Gather input data to chain
+    input_data = {}
+    if task == "Code Translation":
+        input_data["source_language"] = source_language
+        input_data["target_language"] = target_language
+        input_data["content"] = content
+    else:
+        input_data["language"] = language
+        input_data["content"] = content
+    # Run all chain in parallel
+    parallel_runnable = task_template | config.LLM_CHAINS
+    llm_responses = parallel_runnable.invoke(input_data)
+    for model_id, llm_response in llm_responses.items():
+        answer = llm_response.content
 
-    try:
-        # Create messages to send to the API
-        messages = [
-            {"role": "system",
-             "content": f"You are a programming assistant skilled in different tasks like"
-                        f"code completion, translation, and explanation."},
-            {"role": "user",
-             "content": prompt_user[task].format(language=language, source_language=source_language, target_language=target_language) + f": {content}"}
-        ]
-
-        # Iterate through the list of models and get responses
-        for model in models:
-            completion = client.chat.completions.create(
-                model=model,
-                messages=messages
-            )
-            answer = completion.choices[0].message.content
-            response = {}
-            answer_id = insert_answer(answer, model, question_id)
-            response['model'] = model
-            response['answer'] = answer
-            response['answer_id'] = answer_id
-            responses.append(response)
-
-        print("Response type:", type(responses))
-        print("Response content:", responses)
-
-        return responses
-
-    except Exception as e:
-        raise Exception("Error in get_answers_from_models:", str(e))
+        response = {}
+        answer_id = insert_answer(answer, model_id, question_id)
+        response['model'] = config.LLM_ID_NAME[model_id]
+        response['answer'] = answer
+        response['answer_id'] = answer_id
+        responses.append(response)
+        
+    return responses
 
 
 def update_answer(answer_id: int, upvote_i, downvote_i) -> None:
