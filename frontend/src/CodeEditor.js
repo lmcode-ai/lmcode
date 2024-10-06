@@ -1,15 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 import { EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
+import { defaultKeymap } from '@codemirror/commands';
+import { keymap } from '@codemirror/view';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
+import { javascript } from '@codemirror/lang-javascript';
 
 const languageExtensions = {
   Python: python,
   Java: java,
   C: cpp,
+  cpp: cpp,
+  JavaScript: javascript,
+  TypeScript: javascript,
 };
 
 const Height = '300px';
@@ -24,6 +30,7 @@ const CodeEditor = ({ language, code, setCode }) => {
       extensions: [
         languageExtensions[language] ? languageExtensions[language]() : languageExtensions['Python'](),
         quietlight,
+        keymap.of(defaultKeymap), // Enable default key bindings, especially for enabling Enter key
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             setCode(update.state.doc.toString());
