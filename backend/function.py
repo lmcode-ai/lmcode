@@ -3,6 +3,7 @@ from flask_cors import CORS
 from models import db, Language, Question, Answer
 from config import config
 from langchain_core.runnables import RunnableParallel
+import random
 
 
 def insert_question(title, content, language, source_language, target_language, task, ip_address) -> int:
@@ -90,6 +91,10 @@ def get_answers_from_models(content, language, source_language, target_language,
         response['answer'] = answer
         response['answer_id'] = answer_id
         responses.append(response)
+
+    random.shuffle(responses)
+    for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
+        response['model'] = f"model {chr(idx)}"
         
     return responses
 

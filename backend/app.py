@@ -4,7 +4,7 @@ from models import db, Language, Question, Answer, Feedback
 import os
 import function
 from config import config
-import random
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -70,7 +70,7 @@ def handle_questions():
         task = data.get('task')
         question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
         response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
-        random.shuffle(response)
+        
         print("Response type:", type(response))
         print("Response content:", response)
         # MOCK RESPONSE
