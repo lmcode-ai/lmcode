@@ -33,12 +33,6 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
     setReportDialogOpen(false);
   };
 
-  const generateColabLink = (code) => {
-    const colabBaseURL = "https://colab.research.google.com/drive/1GQvEy3FzMGRtB3lZqZj8djBi-yjJ4gYa";
-    const encodedCode = encodeURIComponent(`# This is a template notebook\n\n${code}`);
-    return `${colabBaseURL}?usp=sharing&source=web&authuser=0#scrollTo=0&code=${encodedCode}`;
-  };
-
   // Split the answer into model and content
   const [model, ...answerContent] = answer.split(': ');
   const displayAnswer = answerContent.join(': ');
@@ -156,17 +150,6 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
               </IconButton>
             </Tooltip>
           )}
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            href={generateColabLink(displayAnswer)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Run in Google Colab
-          </Button>
         </Box>
         <Divider sx={{ mt: 2 }} />
         <ErrorReportDialog
