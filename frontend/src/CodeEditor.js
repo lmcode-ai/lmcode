@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { EditorView, basicSetup } from 'codemirror';
+import { EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
@@ -10,15 +10,10 @@ const languageExtensions = {
   Python: python,
   Java: java,
   C: cpp,
-  PyTorch: python,
-  TensorFlow: python,
-  Gaudi: python,
-  NumPy: python,
-  'Apple MLX': python,
-  Gemmini: cpp,
 };
 
 const Height = '300px';
+const FontSize = '16px';
 
 const CodeEditor = ({ language, code, setCode }) => {
   const editorRef = useRef();
@@ -27,7 +22,6 @@ const CodeEditor = ({ language, code, setCode }) => {
     const startState = EditorState.create({
       doc: code,
       extensions: [
-        basicSetup,
         languageExtensions[language] ? languageExtensions[language]() : languageExtensions['Python'](),
         quietlight,
         EditorView.updateListener.of((update) => {
@@ -44,6 +38,8 @@ const CodeEditor = ({ language, code, setCode }) => {
           },
           ".cm-content": {
             height: "100%", // Ensure the content area takes full height
+            backgroundColor: "#fafafa",
+            fontSize: FontSize,
           },
         }),
       ],
