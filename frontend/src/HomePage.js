@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, InputAdornment } from '@mui/material';
-import { GoogleLogin } from '@react-oauth/google'; // Import the new GoogleLogin button
-import SearchIcon from '@mui/icons-material/Search'; // Import the Search icon
+// import { GoogleLogin } from '@react-oauth/google'; // Import the new GoogleLogin button
+// import SearchIcon from '@mui/icons-material/Search'; // Import the Search icon
 import TaskSelection from './TaskSelection';
 import LanguageSelection from './LanguageSelection';
 import CodeEditor from './CodeEditor';
@@ -18,7 +18,7 @@ const HomePage = () => {
   const [code, setCode] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  // const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -49,23 +49,24 @@ const HomePage = () => {
     setOpenDialog(false);
   };
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  // const handleSearch = (e) => {
+  //   setSearchQuery(e.target.value);
+  // };
 
-  const handleGoogleLoginSuccess = (credentialResponse) => {
-    console.log('Google login successful:', credentialResponse);
-    // Handle login success (e.g., authenticate with your backend)
-  };
+  // const handleGoogleLoginSuccess = (credentialResponse) => {
+  //   console.log('Google login successful:', credentialResponse);
+  //   // Handle login success (e.g., authenticate with your backend)
+  // };
 
-  const handleGoogleLoginError = () => {
-    console.log('Google login failed');
-  };
+  // const handleGoogleLoginError = () => {
+  //   console.log('Google login failed');
+  // };
 
   return (
     <Container>
       {/* Top Bar with Search and Google Login */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+      {/* Temporariliy removing it for release. */}
+      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
         <TextField
           label="Search"
           variant="outlined"
@@ -85,7 +86,7 @@ const HomePage = () => {
           onSuccess={handleGoogleLoginSuccess}
           onError={handleGoogleLoginError}
         />
-      </Box>
+      </Box> */}
       
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
