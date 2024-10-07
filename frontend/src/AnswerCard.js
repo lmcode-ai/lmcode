@@ -24,8 +24,8 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
     setReportDialogOpen(true);
   };
 
-  const handleReportSubmit = (errorType) => {
-    onReport(index, errorType);
+  const handleReportSubmit = (errorFeedback) => {
+    onReport(index, errorFeedback);
     setReportDialogOpen(false);
   };
 
