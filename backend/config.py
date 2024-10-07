@@ -10,6 +10,8 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_google_vertexai import ChatVertexAI
 from vertexai.preview import reasoning_engines
 import vertexai
+import logging
+from logging.handlers import RotatingFileHandler
 
 
 class Config:
@@ -19,6 +21,10 @@ class Config:
             config_data = yaml.safe_load(file)
 
         load_dotenv()
+
+        # Instance path as directory
+        self.INSTANCE_PATH = config_data.get("instance", {}).get("path", "instance")
+        os.makedirs(self.INSTANCE_PATH, exist_ok=True) 
 
         # Database settings
         self.SQLALCHEMY_DATABASE_URI = config_data.get("database", {}).get(
@@ -31,6 +37,19 @@ class Config:
             "file_name", "app.db"
         )
 
+        # Log settings
+        self.LOGFILE = os.path.join(self.INSTANCE_PATH, config_data.get("logging", {}).get("file_name", "logfile.log"))
+
+        log_handler = RotatingFileHandler(self.LOGFILE, maxBytes=10000, backupCount=3)
+        log_handler.setLevel(logging.INFO) 
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        log_handler.setFormatter(formatter)
+
+        root_logger = logging.getLogger()
+        root_logger.addHandler(log_handler)
+        root_logger.setLevel(logging.INFO) 
+
         # API Keys
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         self.ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
@@ -39,13 +58,13 @@ class Config:
 
         # Check if any API key is missing and issue a warning
         if not self.OPENAI_API_KEY:
-            warnings.warn("OpenAI API key is missing! Some features may not work.")
+            logging.warning("OpenAI API key is missing! Some features may not work.")
         if not self.GEMINI_API_KEY:
-            warnings.warn("Gemini API key is missing! Some features may not work.")
+            logging.warning("Gemini API key is missing! Some features may not work.")
         if not self.ANTHROPIC_API_KEY:
-            warnings.warn("Anthropic API key is missing! Some features may not work.")
+            logging.warning("Anthropic API key is missing! Some features may not work.")
         if not self.HF_API_KEY:
-            warnings.warn(
+            logging.warning(
                 "Hugging Face API key is missing! Some features may not work."
             )
 
@@ -102,9 +121,9 @@ class Config:
                 project=self.GOOGLE_AI_PLATFORM_PROJECT_NAME,
                 location=self.GOOGLE_AI_PLATFORM_LOCATION,
             )
-            print("Using Google AI Platform")
+            logging.info("Using Google AI Platform")
         else:
-            print("Using Gemini through developer platform")
+            logging.info("Using Gemini through developer platform")
 
         self.LLM_TIMEOUT = config_data.get("llm", {}).get("timeout", 60)
         self.LLM_RETRIES = config_data.get("llm", {}).get("retries", 3)
@@ -202,9 +221,9 @@ class Config:
                             )
                     llm_client.invoke("Sanity test")
                     self.LLM_CHAINS[model.get("id")] = llm_client
-                    print(f"Successfully added {source} model {model.get('id')}")
+                    logging.info(f"Successfully added {source} model {model.get('id')}")
                 except Exception as e:
-                    print(f"Error with {source} model {model.get('id')}: {e}")
+                    logging.error(f"Error with {source} model {model.get('id')}: {e}")
 
 
 config = Config()
