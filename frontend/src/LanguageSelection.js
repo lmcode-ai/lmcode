@@ -61,12 +61,9 @@ const LanguageSelection = ({ label, language, setLanguage }) => {
           <MenuItem value="Python">Python</MenuItem>
           <MenuItem value="Java">Java</MenuItem>
           <MenuItem value="C">C</MenuItem>
-          <MenuItem value="PyTorch">PyTorch</MenuItem>
-          <MenuItem value="TensorFlow">TensorFlow</MenuItem>
-          <MenuItem value="Gaudi">Gaudi</MenuItem>
-          <MenuItem value="NumPy">NumPy</MenuItem>
-          <MenuItem value="Apple MLX">Apple MLX</MenuItem>
-          <MenuItem value="Gemmini">Gemmini</MenuItem>
+          <MenuItem value="Cpp">C++</MenuItem>
+          <MenuItem value="JavaScript">JavaScript</MenuItem>
+          <MenuItem value="TypeScript">TypeScript</MenuItem>
           <MenuItem 
             value="custom" 
             sx={{

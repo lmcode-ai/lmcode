@@ -3,4 +3,14 @@ Flask-SQLAlchemy
 Flask-Cors
 requests
 python-dotenv
-openai
+pyyaml
+langchain
+langchain-google-genai
+langchain-community
+langchain_huggingface
+langchain_openai
+python-dotenv
+anthropic
+langchain_google_vertexai
+google-cloud-aiplatform[reasoningengine,langchain]
+langchain-anthropic

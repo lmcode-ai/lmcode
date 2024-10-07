@@ -1,22 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer, Feedback
-from openai import OpenAI
 import os
 import function
+from config import config
+
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
 
     # Configuration for SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///code_arena.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI 
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
 
     with app.app_context():
-        db_path = os.path.join(app.instance_path, 'code_arena.db')
+        db_path = os.path.join(app.instance_path, config.SQLALCHEMY_FILENAME)
         if not os.path.exists(db_path):
             print("Creating database and tables...")
             db.create_all()
@@ -26,61 +27,7 @@ def create_app():
 
     return app
 
-
 app = create_app()
-client = OpenAI()
-
-
-# @app.route('/api/get_openai_response', methods=['POST'])
-# def get_openai_response():
-#     # Get data from request
-#     data = request.get_json()
-#     task = data.get('task')
-#     code = data.get('code')
-#     language = data.get('language')
-#     source_language = data.get('sourceLanguage')
-#     target_language = data.get('targetLanguage')
-#     question_id = data.get('questionId')
-#
-#     models = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o']
-#
-#     responses = {}
-#
-#     prompt_user = {
-#         "Code Completion": "Complete the code snippet written in {language}",
-#         "Code Translation": "Translate the code snippet from {source_language} to {target_language}",
-#         "Code Explanation": "Explain the code snippet written in {language}",
-#         "Code Repair": "Fix the code snippet written in {language}"
-#     }
-#
-#     try:
-#         # Create messages to send to the API
-#         messages = [
-#             {"role": "system",
-#              "content": f"You are a programming assistant skilled in different tasks like"
-#                         f"code completion, translation, and explanation."},
-#             {"role": "user",
-#              "content": prompt_user[task].format(language=language, source_language=source_language, target_language=target_language) + f": {code}"}
-#         ]
-#
-#         # Iterate through the list of models and get responses
-#         # Iterate through the list of models and get responses
-#         for model in models:
-#             completion = client.chat.completions.create(
-#                 model=model,
-#                 messages=messages
-#             )
-#             responses[model] = completion.choices[0].message.content
-#
-#         print("Response type:", type(responses))
-#         print("Response content:", responses)
-#
-#         return jsonify(responses)
-#     except Exception as e:
-#         # Handle errors in OpenAI API call
-#         print("Error:", str(e))
-#         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/add_language', methods=['POST'])
 def add_language():
@@ -113,6 +60,7 @@ def handle_questions():
     invoke this when the page is directed to the result page.
     """
     try:
+        ip_address = request.remote_addr
         data = request.get_json()
         question_title = data.get('title')
         question_content = data.get('content')
@@ -120,31 +68,35 @@ def handle_questions():
         source_language = data.get('sourceLanguage')
         target_language = data.get('targetLanguage')
         task = data.get('task')
-        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task)
-        # response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
-        example_responses = [
-            {
-                'model': 'model 1',
-                'answer': 'answer 1',
-                'answer_id': 1
-            },
-            {
-                'model': 'model 2',
-                'answer': 'answer 2',
-                'answer_id': 2
-            },
-            {
-                'model': 'model 3',
-                'answer': 'answer 3',
-                'answer_id': 3
-            },
-            {
-                'model': 'model 4',
-                'answer': 'answer 4',
-                'answer_id': 4
-            }
-        ]
-        return jsonify(example_responses)
+        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
+        response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
+        
+        print("Response type:", type(response))
+        print("Response content:", response)
+        # MOCK RESPONSE
+        # response = [
+        #     {
+        #         'model': 'model 1',
+        #         'answer': 'answer 1',
+        #         'answer_id': 1
+        #     },
+        #     {
+        #         'model': 'model 2',
+        #         'answer': 'answer 2',
+        #         'answer_id': 2
+        #     },
+        #     {
+        #         'model': 'model 3',
+        #         'answer': 'answer 3',
+        #         'answer_id': 3
+        #     },
+        #     {
+        #         'model': 'model 4',
+        #         'answer': 'answer 4',
+        #         'answer_id': 4
+        #     }
+        # ]
+        return jsonify(response)
     except Exception as e:
         return jsonify({'Error in handle_questions': str(e)}), 500
 

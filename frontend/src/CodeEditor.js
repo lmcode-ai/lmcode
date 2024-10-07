@@ -1,24 +1,25 @@
 import React, { useEffect, useRef } from 'react';
-import { EditorView, basicSetup } from 'codemirror';
+import { EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
+import { defaultKeymap } from '@codemirror/commands';
+import { keymap } from '@codemirror/view';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
+import { javascript } from '@codemirror/lang-javascript';
 
 const languageExtensions = {
   Python: python,
   Java: java,
   C: cpp,
-  PyTorch: python,
-  TensorFlow: python,
-  Gaudi: python,
-  NumPy: python,
-  'Apple MLX': python,
-  Gemmini: cpp,
+  cpp: cpp,
+  JavaScript: javascript,
+  TypeScript: javascript,
 };
 
 const Height = '300px';
+const FontSize = '16px';
 
 const CodeEditor = ({ language, code, setCode }) => {
   const editorRef = useRef();
@@ -27,9 +28,9 @@ const CodeEditor = ({ language, code, setCode }) => {
     const startState = EditorState.create({
       doc: code,
       extensions: [
-        basicSetup,
         languageExtensions[language] ? languageExtensions[language]() : languageExtensions['Python'](),
         quietlight,
+        keymap.of(defaultKeymap), // Enable default key bindings, especially for enabling Enter key
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             setCode(update.state.doc.toString());
@@ -44,6 +45,8 @@ const CodeEditor = ({ language, code, setCode }) => {
           },
           ".cm-content": {
             height: "100%", // Ensure the content area takes full height
+            backgroundColor: "#fafafa",
+            fontSize: FontSize,
           },
         }),
       ],
