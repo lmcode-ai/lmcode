@@ -87,18 +87,18 @@ const HomePage = () => {
           onError={handleGoogleLoginError}
         />
       </Box> */}
-      
+
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          LMcode
+          LMCode
         </Typography>
-        <TextField 
-          label="Question Title" 
-          variant="outlined" 
-          fullWidth 
-          margin="normal" 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
+        <TextField
+          label="Question Title"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TaskSelection task={task} setTask={setTask} />
         <TaskDescription task={task} />

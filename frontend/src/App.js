@@ -8,12 +8,10 @@ import AboutUsPage from './AboutUsPage';
 import DisclaimerPopup from './DisclaimerPopup';
 import Navbar from './NavBar';
 
-const GOOGLE_CLIENT_ID = '1011505161223-ajksarufqtl9iile2d3i25sg6jckegkb.apps.googleusercontent.com'; // Replace with your actual Google Client ID
-
 function App() {
   return (
-
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    // <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <>
       <DisclaimerPopup />
       <Router>
         <Navbar />
@@ -25,7 +23,8 @@ function App() {
           <Route path="/about-us" element={<AboutUsPage />} />
         </Routes>
       </Router>
-    </GoogleOAuthProvider>
+    </>
+    // </GoogleOAuthProvider>
   );
 }
 
