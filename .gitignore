@@ -24,3 +24,6 @@ yarn-error.log*
 
 # React Component Preview
 previewConfig.json
+
+.venv/
+__pycache__/

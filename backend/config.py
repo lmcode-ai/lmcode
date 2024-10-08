@@ -168,7 +168,7 @@ class Config:
                     system_prompt,
                     (
                         "human",
-                        "Follow the instruction to write a code snippet in {language}:\n{content}",
+                        "Follow the instructions below to write a code snippet:\n{content}",
                     ),
                 ]
             ),
