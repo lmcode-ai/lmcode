@@ -40,7 +40,12 @@ class Config:
         # Log settings
         self.LOGFILE = os.path.join(self.INSTANCE_PATH, config_data.get("logging", {}).get("file_name", "logfile.log"))
 
-        log_handler = RotatingFileHandler(self.LOGFILE, maxBytes=10000, backupCount=3)
+        if not config_data.get("logging", {}).get("log_to_file", False):
+            # Log to console
+            log_handler = logging.StreamHandler()
+        else:
+            log_handler = RotatingFileHandler(self.LOGFILE, maxBytes=10000, backupCount=3)
+            
         log_handler.setLevel(logging.INFO) 
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

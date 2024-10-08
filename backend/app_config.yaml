@@ -8,6 +8,7 @@ database:
 
 logging:
   file_name: "logfile.log"
+  log_to_file: false
 
 llm:
   openai:
