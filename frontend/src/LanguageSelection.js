@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-import { 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  TextField, 
-  Button, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText, 
-  DialogTitle 
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectLanguageOptions, addLanguage } from './redux/languageOptionsSlice';
+
 
 const LanguageSelection = ({ label, language, setLanguage }) => {
+  const dispatch = useDispatch();
+  const languages = useSelector(selectLanguageOptions);
+
   const [customLanguage, setCustomLanguage] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
@@ -27,7 +33,12 @@ const LanguageSelection = ({ label, language, setLanguage }) => {
     }
   };
 
-  const handleCustomLanguageSubmit = async () => {
+  const handleCustomLanguageSubmit = async (event) => {
+    event.preventDefault();
+    const trimmedLanguage = customLanguage.trim();
+    if (trimmedLanguage && !languages.includes(trimmedLanguage)) {
+      dispatch(addLanguage(trimmedLanguage));
+    }
     if (customLanguage.trim()) {
       try {
         const trimmedLanguage = customLanguage.trim();
@@ -58,14 +69,13 @@ const LanguageSelection = ({ label, language, setLanguage }) => {
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>{label}</InputLabel>
         <Select value={language} onChange={handleLanguageChange} label={label}>
-          <MenuItem value="Python">Python</MenuItem>
-          <MenuItem value="Java">Java</MenuItem>
-          <MenuItem value="C">C</MenuItem>
-          <MenuItem value="Cpp">C++</MenuItem>
-          <MenuItem value="JavaScript">JavaScript</MenuItem>
-          <MenuItem value="TypeScript">TypeScript</MenuItem>
-          <MenuItem 
-            value="custom" 
+        {languages.map((language) => (
+          <MenuItem key={language} value={language}>
+            {language}
+          </MenuItem>
+        ))}
+          <MenuItem
+            value="custom"
             sx={{
               fontWeight: 'bold',
               color: 'darkblue',
