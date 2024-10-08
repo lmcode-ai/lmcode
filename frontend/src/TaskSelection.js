@@ -10,6 +10,7 @@ const TaskSelection = ({ task, setTask }) => (
       <MenuItem value="Code Repair">Code Repair</MenuItem>
       <MenuItem value="Text-to-Code Generation">Text-to-Code Generation</MenuItem>
       <MenuItem value="Code Summarization">Code Summarization</MenuItem>
+      <MenuItem value="Input/Output Examples">Input/Output Example</MenuItem>
     </Select>
   </FormControl>
 );

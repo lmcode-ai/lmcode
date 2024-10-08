@@ -157,6 +157,15 @@ class Config:
                     ),
                 ]
             ),
+            "Input/Output Examples": ChatPromptTemplate(
+                [
+                    system_prompt,
+                    (
+                        "human",
+                        "Provide code snippet that satisfies the input and output examples written in {language}:\n{content}",
+                    ),
+                ]
+            ),
         }
 
         # setup all client chains

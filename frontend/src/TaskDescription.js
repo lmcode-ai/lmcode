@@ -64,6 +64,40 @@ const taskDescriptions = {
       output: `# This function returns the sum of two numbers`,
     },
   },
+  'Input/Output Examples': {
+    description: 'Generate the code that satisfies specfic input/output example(s).',
+    inputDescription: 'A description of the input and output example(s) for your desired function.',
+    outputDescription: 'the generated code that satisfies the input/output example(s).',
+    example: {
+      language: 'python',
+      input: `Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+Example 3:
+Input: nums = [3,3], target = 6
+Output: [0,1]`,
+      output: `def two_sum(nums, target):
+    # Create a dictionary to store the index of the elements
+    num_map = {}
+    
+    # Iterate through the list
+    for i, num in enumerate(nums):
+        # Calculate the complement of the current number
+        complement = target - num
+        
+        # If the complement is in the dictionary, return its index and the current index
+        if complement in num_map:
+            return [num_map[complement], i]
+        
+        # Otherwise, store the current number with its index in the dictionary
+        num_map[num] = i`,
+    },
+  }
 };
 
 const TaskDescription = ({ task }) => {
