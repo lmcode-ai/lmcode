@@ -7,6 +7,7 @@ import TaskSelection from './TaskSelection';
 import LanguageSelection from './LanguageSelection';
 import CodeEditor from './CodeEditor';
 import TaskDescription from './TaskDescription';
+import InstructionsCard from './InstructionsCard';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ const HomePage = () => {
 
   return (
     <Container>
+      <InstructionsCard />
       {/* Top Bar with Search and Google Login */}
       {/* Temporariliy removing it for release. */}
       {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
