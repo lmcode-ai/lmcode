@@ -104,8 +104,9 @@ const ResultPage = () => {
     setAcceptedAnswer((prev) => (prev === index ? null : prev));
   };
 
-  const handleReport = (index, errorType) => {
-    console.log(`Reported error for answer ${index}: ${errorType}`);
+  const handleReport = (index, errorFeedback) => {
+    console.log(`Reported error for answer ${index}: ${errorFeedback}`);
+
   };
 
   const editorRef = useRef();

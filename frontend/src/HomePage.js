@@ -90,7 +90,7 @@ const HomePage = () => {
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          LMcode
+          LMCode
         </Typography>
         <TextField
           label="Question Title"
