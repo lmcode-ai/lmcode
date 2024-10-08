@@ -63,7 +63,7 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
           }}
         />
         <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-          <IconButton
+          {/* <IconButton
             color={voted === 'upvoted' ? 'primary' : 'default'}
             onClick={() => onVote(index, 'upvote')}
           >
@@ -78,7 +78,7 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
             sx={{ ml: 2 }}
           >
             <KeyboardArrowDownOutlinedIcon />
-          </IconButton>
+          </IconButton> */}
           <Tooltip
             title="Accept this answer"
             placement="top"
