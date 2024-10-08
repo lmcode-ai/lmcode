@@ -1,4 +1,5 @@
 instance/app.db
 instance/logfile.log
+instance/logfile.log.*
 .env
 __pycache__
