@@ -87,32 +87,34 @@ const HomePage = () => {
           onError={handleGoogleLoginError}
         />
       </Box> */}
-      
+
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
           LMcode
         </Typography>
-        <TextField 
-          label="Question Title" 
-          variant="outlined" 
-          fullWidth 
-          margin="normal" 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
+        <TextField
+          label="Question Title"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TaskSelection task={task} setTask={setTask} />
         <TaskDescription task={task} />
-          <>
-            {(task !== 'Code Translation') ? (
+        <>
+          {(task === 'Code Translation') ? (
+            <>
+              <LanguageSelection label="Source Language" language={sourceLanguage} setLanguage={setSourceLanguage} />
+              <LanguageSelection label="Target Language" language={targetLanguage} setLanguage={setTargetLanguage} />
+            </>
+          ) : (
+            task !== 'Text-to-Code Generation' && (
               <LanguageSelection label="Choose Language" language={language} setLanguage={setLanguage} />
-            ) : (
-              <>
-                <LanguageSelection label="Source Language" language={sourceLanguage} setLanguage={setSourceLanguage} />
-                <LanguageSelection label="Target Language" language={targetLanguage} setLanguage={setTargetLanguage} />
-              </>
-            )}
-            <CodeEditor language={task === 'Code Translation' ? sourceLanguage : language} code={code} setCode={setCode} />
-          </>
+            )
+          )}
+          <CodeEditor language={task === 'Code Translation' ? sourceLanguage : language} code={code} setCode={setCode} />
+        </>
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Submit
         </Button>
