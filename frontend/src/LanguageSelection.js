@@ -34,11 +34,16 @@ const LanguageSelection = ({ label, language, setLanguage }) => {
   };
 
   const handleCustomLanguageSubmit = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     const trimmedLanguage = customLanguage.trim();
     if (trimmedLanguage && !languages.includes(trimmedLanguage)) {
       dispatch(addLanguage(trimmedLanguage));
     }
+    // We should clear the text input field for future
+    setCustomLanguage("");
+    // Then we should select the custom language
+    setLanguage(trimmedLanguage);
+    setShowCustomInput(false);
     if (customLanguage.trim()) {
       try {
         const trimmedLanguage = customLanguage.trim();
