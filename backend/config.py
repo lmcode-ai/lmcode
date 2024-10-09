@@ -184,7 +184,7 @@ class Config:
         }
 
         # setup all client chains
-        self.LLM_CHAINS = {}  # dict of model name to llm
+        self.LLM_CHAINS = {}  # dict of model id to llm
 
         for source, models in self.LLM_DICT.items():
             for model in models:

@@ -85,7 +85,7 @@ def get_answers_from_models(content, language, source_language, target_language,
     parallel_runnable = task_template | config.LLM_CHAINS
     llm_responses = parallel_runnable.invoke(input_data)
 
-    for model_id, _ in config.LLM_ID_NAME.items():
+    for model_id, _ in config.LLM_CHAINS.items():
         if model_id not in llm_responses:
             # LLM Error has occured
             llmError = LLMError(
