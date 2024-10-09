@@ -8,7 +8,7 @@ database:
 
 logging:
   file_name: "logfile.log"
-  log_to_file: false
+  log_to_file: false # if false, logging to console
 
 llm:
   openai:

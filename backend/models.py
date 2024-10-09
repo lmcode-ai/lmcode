@@ -38,6 +38,7 @@ class Answer(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     question = db.relationship('Question', backref=db.backref('answers', lazy=True), foreign_keys=[question_id])
+    frontend_order = db.Column(db.Integer, default=-1)
 
 
 class Feedback(db.Model):

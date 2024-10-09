@@ -34,7 +34,7 @@ def insert_question(title, content, language, source_language, target_language, 
     return question.id
 
 
-def insert_answer(content, model, question_id) -> int:
+def insert_answer(content, model, question_id, order=-1) -> int:
     """
     Add an answer to the database
     :param content: the answer content
@@ -46,7 +46,8 @@ def insert_answer(content, model, question_id) -> int:
     answer = Answer(
         content=content,
         model=model,
-        question_id=question_id
+        question_id=question_id,
+        frontend_order=order,
     )
 
     db.session.add(answer)
@@ -91,7 +92,7 @@ def get_answers_from_models(content, language, source_language, target_language,
                 question_id=question_id,
                 model_id=model_id,
                 prompt=task_template.format(**input_data),
-                llmError="Something went wrong during parallel call",
+                error="Something went wrong during LLM call",
             )
             db.session.add(llmError)
             db.session.commit()
@@ -99,15 +100,16 @@ def get_answers_from_models(content, language, source_language, target_language,
             answer = llm_responses[model_id].content
 
             response = {}
-            answer_id = insert_answer(answer, model_id, question_id)
-            response['model'] = config.LLM_ID_NAME[model_id]
+            response['model_name'] = config.LLM_ID_NAME[model_id]
+            response['model_id'] = model_id
             response['answer'] = answer
-            response['answer_id'] = answer_id
             responses.append(response)
 
     random.shuffle(responses)
     for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
-        response['model'] = f"model {chr(idx)}"
+        response['model'] = f"model {chr(idx)}" # name displayed at frontend
+        answer_id = insert_answer(answer, model_id, question_id, order=idx-65)
+        response['answer_id'] = answer_id
         
     return responses
 
