@@ -12,39 +12,50 @@ const Navbar = () => {
     <AppBar position="static">
       <Toolbar variant="dense" sx={{ display: 'flex', alignItems: 'center' }}>
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
-            <Box
-              component="img"
-              src={logo}
-              alt="Logo"
-              sx={{ width: 30, height: 30, borderRadius: '50%', marginRight: 2 }}
-              href="/"
-            />
-            <Typography variant="h7" component="div">
-              LMCode
-            </Typography>
-          </Link>
-          <Box sx={{
+          <Box
+            component="img"
+            src={logo}
+            alt="Logo"
+            sx={{ width: 30, height: 30, borderRadius: '50%', marginRight: 2 }}
+          />
+          <Typography variant="h7" component="div">
+            LMCode
+          </Typography>
+        </Link>
+
+        <Box
+          sx={{
             flexGrow: 1,
             display: { xs: 'none', md: 'flex' },
             alignItems: 'center',
             ml: {
-              xs: '10px',  // Small screens
-              sm: '20px',  // Small to medium screens
-              md: '30px',  // Medium to large screens
-              lg: '40px',  // Large screens
-              xl: '50px',  // Extra large screens
+              xs: '10px',
+              sm: '20px',
+              md: '30px',
+              lg: '40px',
+              xl: '50px',
             }
-          }}>
-            <Button
-              key="about-us"
-              sx={{ color: 'white', display: 'block' }}
-              href="/about-us"
-            >
-              <Typography variant="h7" component="div">
-                About us
-              </Typography>
-            </Button>
-          </Box>
+          }}
+        >
+          {/* Leaderboard Link moved before About Us */}
+          <Button
+            key="leaderboard"
+            sx={{ color: 'white', display: 'block' }}
+            component={Link}
+            to="/leaderboard"
+          >
+            Leaderboard
+          </Button>
+
+          <Button
+            key="about-us"
+            sx={{ color: 'white', display: 'block' }}
+            component={Link}
+            to="/about-us"
+          >
+            About Us
+          </Button>
+        </Box>
       </Toolbar>
     </AppBar>
   );
