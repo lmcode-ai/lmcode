@@ -38,6 +38,7 @@ class Answer(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     question = db.relationship('Question', backref=db.backref('answers', lazy=True), foreign_keys=[question_id])
+    frontend_order = db.Column(db.Integer, default=-1)
 
 
 class Feedback(db.Model):
@@ -48,3 +49,12 @@ class Feedback(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     answer_id = db.Column(db.Integer, db.ForeignKey('answer.id'), nullable=False)
     answer = db.relationship('Answer', backref=db.backref('feedbacks', lazy=True), foreign_keys=[answer_id])
+
+
+class LLMError(db.Model):
+    # feedback of LLM not generating an answer
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    model_id = db.Column(db.String, nullable=False)
+    prompt = db.Column(db.String, nullable=False)
+    error = db.Column(db.String, nullable=False)
