@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Box, IconButton, Divider, Tooltip, Button } from '@mui/material';
+import { Card, CardContent, Typography, Box, IconButton, Divider, Tooltip } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy icon
 import CodeBlock from './CodeBlock'; // Adjust the path as necessary
 import ErrorReportDialog from './ErrorReportDialog'; // Adjust the path as necessary
 
@@ -33,6 +34,18 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
     setReportDialogOpen(false);
   };
 
+  // Copy to clipboard function
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code).then(
+      () => {
+        console.log('Copied to clipboard successfully');
+      },
+      (err) => {
+        console.error('Failed to copy: ', err);
+      }
+    );
+  };
+
   // Split the answer into model and content
   const [model, ...answerContent] = answer.split(': ');
   const displayAnswer = answerContent.join(': ');
@@ -48,12 +61,33 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
           components={{
             code({ node, inline, className, children, ...props }) {
               const match = /language-(\w+)/.exec(className || '');
+              const codeContent = String(children).replace(/\n$/, ''); // Extract code content
               return !inline && match ? (
-                <CodeBlock
-                  language={match[1]}
-                  value={String(children).replace(/\n$/, '')}
-                  {...props}
-                />
+                <Box position="relative">
+                  {/* Code block container */}
+                  <CodeBlock
+                    language={match[1]}
+                    value={codeContent}
+                    {...props}
+                  />
+                  {/* Copy button in top-right corner of the code block */}
+                  <IconButton
+                    onClick={() => handleCopy(codeContent)} // Copy the code content
+                    sx={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      color: '#fff',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                      },
+                    }}
+                    size="small"
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Box>
               ) : (
                 <code className={className} {...props}>
                   {children}
@@ -63,22 +97,6 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
           }}
         />
         <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            color={voted === 'upvoted' ? 'primary' : 'default'}
-            onClick={() => onVote(index, 'upvote')}
-          >
-            <KeyboardArrowUpOutlinedIcon />
-          </IconButton>
-          <Typography variant="body2" sx={{ ml: 1 }}>
-            {voteCount}
-          </Typography>
-          <IconButton
-            color={voted === 'downvoted' ? 'primary' : 'default'}
-            onClick={() => onVote(index, 'downvote')}
-            sx={{ ml: 2 }}
-          >
-            <KeyboardArrowDownOutlinedIcon />
-          </IconButton>
           <Tooltip
             title="Accept this answer"
             placement="top"

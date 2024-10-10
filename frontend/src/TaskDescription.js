@@ -49,8 +49,7 @@ const taskDescriptions = {
     inputDescription: 'a natural language description of the code',
     outputDescription: 'the generated code',
     example: {
-      language: 'python',
-      input: `Create a function to check if a number is even`,
+      input: `Create a python function to check if a number is even`,
       output: `def is_even(n):\n    return n % 2 == 0`,
     },
   },
@@ -128,10 +127,10 @@ const TaskDescription = ({ task }) => {
         <strong>Output:</strong> {outputDescription}
       </Typography>
       <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-        <Button 
-          variant="contained" 
-          onClick={handleToggleExample} 
-          endIcon={showExample ? <ExpandLessIcon /> : <ExpandMoreIcon />} 
+        <Button
+          variant="contained"
+          onClick={handleToggleExample}
+          endIcon={showExample ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           style={{ backgroundColor: 'white', color: 'black', textTransform: 'none' }}
         >
           {showExample ? 'Hide Example' : 'See Example'}
@@ -139,14 +138,16 @@ const TaskDescription = ({ task }) => {
       </Box>
       <Collapse in={showExample}>
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
-            Language: {example.language}
-          </Typography>
+          {example.language && (
+            <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
+              Language: {example.language}
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
             Input:
           </Typography>
           <Box sx={{ position: 'relative' }}>
-            <SyntaxHighlighter language={example.language} style={docco}>
+            <SyntaxHighlighter language={example.language || 'text'} style={docco}>
               {example.input}
             </SyntaxHighlighter>
             <IconButton
@@ -160,7 +161,7 @@ const TaskDescription = ({ task }) => {
           <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1, mt: 2 }}>
             Output:
           </Typography>
-          <SyntaxHighlighter language={example.language} style={docco}>
+          <SyntaxHighlighter language={example.language || 'text'} style={docco}>
             {example.output}
           </SyntaxHighlighter>
         </Box>
@@ -168,5 +169,6 @@ const TaskDescription = ({ task }) => {
     </Paper>
   );
 };
+
 
 export default TaskDescription;

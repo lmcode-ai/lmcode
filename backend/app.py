@@ -4,6 +4,7 @@ from models import db, Language, Question, Answer, Feedback
 import os
 import function
 from config import config
+import logging
 
 
 def create_app():
@@ -19,11 +20,11 @@ def create_app():
     with app.app_context():
         db_path = os.path.join(app.instance_path, config.SQLALCHEMY_FILENAME)
         if not os.path.exists(db_path):
-            print("Creating database and tables...")
+            logging.info("Creating database and tables...")
             db.create_all()
-            print("Database and tables created.")
+            logging.info("Database and tables created.")
         else:
-            print("Database already exists.")
+            logging.info("Database already exists.")
 
     return app
 
@@ -33,19 +34,24 @@ app = create_app()
 def add_language():
     data = request.get_json()
     language_name = data.get('language')
-
+    logging.info(f"<add_language> request: {request.get_json()}")
     if not language_name:
-        return jsonify({'error': 'Language name is required'}), 400
+        err_msg = 'Language name is required'
+        logging.error(f"<add_language> error: {err_msg}")
+        return jsonify({'error': err_msg}), 400
 
     language = Language.query.filter_by(name=language_name).first()
 
     if language:
         language.count += 1
+        logging.info(f"<add_language> {language_name} exists. Incremented count to {language.count}.")
     else:
         language = Language(name=language_name)
         db.session.add(language)
+        logging.info(f"<add_language> added new language: {language_name}")
 
     db.session.commit()
+    logging.info(f"<add_language> database commit successful for language: {language_name}")
 
     return jsonify({'message': 'Language added/updated successfully'})
 
@@ -59,6 +65,7 @@ def handle_questions():
     return the related information of each answer {model, answer, answer_id}
     invoke this when the page is directed to the result page.
     """
+    logging.info(f"<handle_questions> request: {request.get_json()}")
     try:
         ip_address = request.remote_addr
         data = request.get_json()
@@ -71,8 +78,8 @@ def handle_questions():
         question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
         response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
         
-        print("Response type:", type(response))
-        print("Response content:", response)
+        logging.info(f"<handle_questions> llm response: {response}")
+
         # MOCK RESPONSE
         # response = [
         #     {
@@ -98,7 +105,9 @@ def handle_questions():
         # ]
         return jsonify(response)
     except Exception as e:
-        return jsonify({'Error in handle_questions': str(e)}), 500
+        err_msg = str(e)
+        logging.error(f"<handle_questions> Error in handle_questions: {err_msg}")
+        return jsonify({'error': err_msg}), 500
 
 
 @app.route("/api/answers/update", methods=['POST'])
@@ -123,15 +132,21 @@ def accept_answer():
         answer_id = data.get('answer_id')
         answer = Answer.query.get(answer_id)
         if not answer:
-            return jsonify({'Error in <accept_answer>': 'Answer not found'}), 404
+            err_msg = "Answer not found"
+            logging.error(f"<accept_answer> error: {err_msg}")
+            return jsonify({'error': err_msg}), 404
         question = Question.query.get(answer.question_id)
         if not question:
-            return jsonify({'Error in <accept_answer>': 'Question not found'}), 404
+            err_msg = "Question not found"
+            logging.error(f"<accept_answer> error: {err_msg}")
+            return jsonify({'error': err_msg}), 404
         question.accepted_answer_id = answer_id
         db.session.commit()
         return jsonify({'message': 'Answer accepted successfully'})
     except Exception as e:
-        return jsonify({'Error in <accept_answer>': str(e)}), 500
+        err_msg = str(e)
+        logging.error(f"<accept_answer> error: {err_msg}")
+        return jsonify({'error': err_msg}), 500
 
 
 @app.route("/api/answers/feedback", methods=['POST'])
@@ -156,52 +171,52 @@ def upsert_feedback():
 #     pass
 
 
-@app.route("/api/get_answers", methods=['GET'])
-def get_answer():
-    pass
+# @app.route("/api/get_answers", methods=['GET'])
+# def get_answer():
+#     pass
 
 
-from flask import request, jsonify
-from sqlalchemy import or_
-from models import Question  # assuming your Question model is in models.py
-from sqlalchemy.sql import func
+# from flask import request, jsonify
+# from sqlalchemy import or_
+# from models import Question  # assuming your Question model is in models.py
+# from sqlalchemy.sql import func
 
-@app.route('/api/search_questions', methods=['GET'])
-def search_questions():
-    query = request.args.get('query', '')
-    if not query:
-        return jsonify({'questions': []})
+# @app.route('/api/search_questions', methods=['GET'])
+# def search_questions():
+#     query = request.args.get('query', '')
+#     if not query:
+#         return jsonify({'questions': []})
 
-    # Fuzzy search on title and content
-    search = "%{}%".format(query)
-    results = Question.query.filter(or_(
-        Question.title.ilike(search),
-        Question.content.ilike(search)
-    )).all()
+#     # Fuzzy search on title and content
+#     search = "%{}%".format(query)
+#     results = Question.query.filter(or_(
+#         Question.title.ilike(search),
+#         Question.content.ilike(search)
+#     )).all()
 
-    # Convert results to a list of dictionaries
-    questions = [{'id': q.id, 'title': q.title, 'task': q.task} for q in results]
-    return jsonify({'questions': questions})
+#     # Convert results to a list of dictionaries
+#     questions = [{'id': q.id, 'title': q.title, 'task': q.task} for q in results]
+#     return jsonify({'questions': questions})
 
-@app.route('/api/random_questions', methods=['GET'])
-def random_questions():
-    # Get random 5 questions
-    questions = Question.query.order_by(func.random()).limit(5).all()
-    questions_list = [{'id': q.id, 'title': q.title, 'task': q.task} for q in questions]
-    return jsonify({'questions': questions_list})
+# @app.route('/api/random_questions', methods=['GET'])
+# def random_questions():
+#     # Get random 5 questions
+#     questions = Question.query.order_by(func.random()).limit(5).all()
+#     questions_list = [{'id': q.id, 'title': q.title, 'task': q.task} for q in questions]
+#     return jsonify({'questions': questions_list})
 
-@app.route('/api/question/<int:question_id>', methods=['GET'])
-def get_question(question_id):
-    question = Question.query.get_or_404(question_id)
-    return jsonify({
-        'id': question.id,
-        'title': question.title,
-        'content': question.content,
-        'language': question.language,
-        'source_language': question.source_language,
-        'target_language': question.target_language,
-        'task': question.task
-    })
+# @app.route('/api/question/<int:question_id>', methods=['GET'])
+# def get_question(question_id):
+#     question = Question.query.get_or_404(question_id)
+#     return jsonify({
+#         'id': question.id,
+#         'title': question.title,
+#         'content': question.content,
+#         'language': question.language,
+#         'source_language': question.source_language,
+#         'target_language': question.target_language,
+#         'task': question.task
+#     })
 
 
 if __name__ == '__main__':
