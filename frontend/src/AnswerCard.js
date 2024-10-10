@@ -3,10 +3,9 @@ import { Card, CardContent, Typography, Box, IconButton, Divider, Tooltip } from
 import ReactMarkdown from 'react-markdown';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy icon
 import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
-import ErrorReportDialog from './ErrorReportDialog'; // Adjust the path as necessary
+import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
 
 const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVote, onAccept, onReject, onReport }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
@@ -17,14 +16,11 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
 
   const handleReject = () => {
     onReject(index);
-  };
-
-  const handleReportClick = () => {
     setReportDialogOpen(true);
   };
 
-  const handleReportSubmit = (errorFeedback) => {
-    onReport(index, errorFeedback);
+  const handleReportSubmit = (textFeedback) => {
+    onReport(index, textFeedback);
     setReportDialogOpen(false);
   };
 
@@ -141,34 +137,9 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
               <HighlightOffIcon />
             </IconButton>
           </Tooltip>
-          {rejected && (
-            <Tooltip
-              title="Report an error"
-              placement="top"
-              arrow
-              PopperProps={{
-                modifiers: [
-                  {
-                    name: 'offset',
-                    options: {
-                      offset: [0, -10], // Adjust the offset distance here
-                    },
-                  },
-                ],
-              }}
-            >
-              <IconButton
-                color="error"
-                onClick={handleReportClick}
-                sx={{ ml: 1 }}
-              >
-                <ReportProblemOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          )}
         </Box>
         <Divider sx={{ mt: 2 }} />
-        <ErrorReportDialog
+        <FeedbackDialog
           open={reportDialogOpen}
           onClose={handleReportDialogClose}
           onSubmit={handleReportSubmit}
