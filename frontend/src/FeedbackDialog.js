@@ -1,19 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, FormControl, TextField, Chip, Box } from '@mui/material';
 
 const FeedbackDialog = ({ open, onClose, onSubmit }) => {
   const [selectedBadges, setSelectedBadges] = useState([]);
   const [textFeedback, setTextFeedback] = useState("");
 
-  const badges = [
-    'incorrect output',
-    'syntax error',
-    'performance issue',
-    'security issue',
-    'incomplete code',
-    'misunderstood question',
-    'other',
-  ];
+  const shuffledBadges = useMemo(
+    () => {
+      const badges = [
+        'incorrect output',
+        'syntax error',
+        'performance issue',
+        'security issue',
+        'incomplete code',
+        'misunderstood question',
+        'other',
+      ];
+      return badges
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+    },
+    []
+  );
 
   const handleBadgeClick = (badge) => {
     setSelectedBadges((prev) =>
@@ -40,7 +49,7 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
       <DialogContent sx={{ pb: 0 }}>
         <FormControl component="fieldset" fullWidth>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', marginBottom: 2 }}>
-            {badges.map((badge) => (
+            {shuffledBadges.map((badge) => (
               <Chip
                 key={badge}
                 label={badge}
