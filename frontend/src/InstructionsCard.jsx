@@ -12,7 +12,7 @@ const InstructionsCard = () => {
   ];
 
   return (
-    <Card sx={{ margin: 'auto', mt: 5, p: "2em" }}>
+    <Card sx={{ margin: 'auto', p: "2em" }}>
       {/* We need this styling because card content's implementation adds padding to the last child*/}
       <CardContent sx={{ p:0, '&:last-child': { pb: 0 }}}>
         <Typography variant="h5" component="div" gutterBottom>
