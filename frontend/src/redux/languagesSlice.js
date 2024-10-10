@@ -11,8 +11,8 @@ const initialState = {
   ]
 };
 
-const languageOptionsSlice = createSlice({
-  name: 'languageOptions',
+const languagesSlice = createSlice({
+  name: 'languages',
   initialState,
   reducers: {
     addLanguage: (state, action) => {
@@ -21,6 +21,6 @@ const languageOptionsSlice = createSlice({
   }
 });
 
-export const { addLanguage } = languageOptionsSlice.actions;
-export const selectLanguageOptions = (state) => state.languageOptions.options;
-export default languageOptionsSlice.reducer;
+export const { addLanguage } = languagesSlice.actions;
+export const selectLanguageOptions = (state) => state.languages.options;
+export default languagesSlice.reducer;

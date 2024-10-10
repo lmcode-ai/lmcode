@@ -13,7 +13,7 @@ import {
   DialogTitle
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLanguageOptions, addLanguage } from './redux/languageOptionsSlice';
+import { selectLanguageOptions, addLanguage } from './redux/languagesSlice';
 
 
 const LanguageSelection = ({ label, language, setLanguage }) => {
