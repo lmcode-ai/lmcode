@@ -15,13 +15,18 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
   };
 
   const handleReject = () => {
-    onReject(index);
-    setReportDialogOpen(true);
+    if (rejected) {
+      // If we already rejected, we want to uncolor the reject button
+      onReject(index);
+    } else {
+      setReportDialogOpen(true);
+    }
   };
 
   const handleReportSubmit = (textFeedback) => {
     onReport(index, textFeedback);
     setReportDialogOpen(false);
+    onReject(index);
   };
 
   const handleReportDialogClose = () => {
