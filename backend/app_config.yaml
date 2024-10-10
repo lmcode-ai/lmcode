@@ -1,7 +1,14 @@
+instance:
+  path: "instance"
+
 database:
   file_name: "app.db"
   uri: "sqlite:///app.db"
   track_modifications: false
+
+logging:
+  file_name: "logfile.log"
+  log_to_file: false # if false, logging to console
 
 llm:
   openai:

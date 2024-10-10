@@ -3,12 +3,13 @@ import { Container, Grid, Typography, Card, CardContent, CardMedia, Box, Link } 
 
 import alvin from './assets/images/profile-pics/alvin.jpg';
 import sahil from './assets/images/profile-pics/sahil.jpg';
+import colin from './assets/images/profile-pics/colin.png';
 import { disclaimerText } from './constants';
 
 // Sample images for contributors
 const contributors = [
   { name: 'Candice Yang', image: 'https://via.placeholder.com/100' },
-  { name: 'Colin Cai', image: 'https://via.placeholder.com/100' },
+  { name: 'Colin Cai', image: colin },
   { name: 'Jie Qiu', image: 'https://via.placeholder.com/100' },
   { name: 'Letian Cheng', image: 'https://via.placeholder.com/100' },
   { name: 'Linyuan Gong', image: 'https://via.placeholder.com/100' },

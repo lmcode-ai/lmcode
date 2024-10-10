@@ -5,7 +5,7 @@ import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent,
 // import SearchIcon from '@mui/icons-material/Search'; // Import the Search icon
 import TaskSelection from './TaskSelection';
 import LanguageSelection from './LanguageSelection';
-import CodeEditor from './CodeEditor';
+import CodeEditor from './code/CodeEditor';
 import TaskDescription from './TaskDescription';
 import InstructionsCard from './InstructionsCard';
 
@@ -64,36 +64,35 @@ const HomePage = () => {
   // };
 
   return (
-    <Container>
-      <InstructionsCard />
-      {/* Top Bar with Search and Google Login */}
-      {/* Temporariliy removing it for release. */}
-      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchQuery}
-          onChange={handleSearch}
-          size="small"
-          sx={{ flexGrow: 1, mr: 2 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <GoogleLogin
-          onSuccess={handleGoogleLoginSuccess}
-          onError={handleGoogleLoginError}
-        />
-      </Box> */}
-
-      <Box sx={{ mt: 4 }}>
+    <Container sx={{ my: 4 }}>
+      <Box>
         <Typography variant="h4" gutterBottom>
           LMCode
         </Typography>
+        <InstructionsCard />
+        {/* Top Bar with Search and Google Login */}
+        {/* Temporariliy removing it for release. */}
+        {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchQuery}
+            onChange={handleSearch}
+            size="small"
+            sx={{ flexGrow: 1, mr: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={handleGoogleLoginError}
+          />
+        </Box> */}
         <TextField
           label="Question Title"
           variant="outlined"

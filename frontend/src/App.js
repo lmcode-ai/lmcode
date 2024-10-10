@@ -9,6 +9,7 @@ import DisclaimerPopup from './DisclaimerPopup';
 import Navbar from './NavBar';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import Leaderboard from './Leaderboard';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/result/:questionId" element={<div>Question Detail Page</div>} /> {/* Placeholder for question detail */}
           <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/Leaderboard" element={<Leaderboard />} />
         </Routes>
       </Router>
     </Provider>

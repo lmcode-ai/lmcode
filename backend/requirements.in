@@ -1,0 +1,16 @@
+anthropic
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+google-cloud-aiplatform[reasoningengine,langchain]
+langchain
+langchain_google_vertexai
+langchain_huggingface
+langchain_openai
+langchain-anthropic
+langchain-community
+langchain-google-genai
+python-dotenv
+python-dotenv
+pyyaml
+requests

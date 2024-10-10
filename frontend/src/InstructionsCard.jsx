@@ -12,7 +12,7 @@ const InstructionsCard = () => {
   ];
 
   return (
-    <Card sx={{ margin: 'auto', mt: 5, p: "2em" }}>
+    <Card sx={{ margin: 'auto', p: "2em" }}>
       {/* We need this styling because card content's implementation adds padding to the last child*/}
       <CardContent sx={{ p:0, '&:last-child': { pb: 0 }}}>
         <Typography variant="h5" component="div" gutterBottom>
@@ -20,7 +20,7 @@ const InstructionsCard = () => {
         </Typography>
         <List sx={{ pb: 0 }} dense>
           {instructions.map((instruction, index) => (
-            <ListItem key={index} disableGutters alignItems="flex-start">
+            <ListItem key={index} alignItems="flex-start">
               <ListItemIcon sx={{ minWidth: "2ch", m: 0 }}>
                 <Typography variant="body1">
                   <strong>{index + 1}.</strong>
@@ -29,7 +29,7 @@ const InstructionsCard = () => {
               <ListItemText
                 sx={{ m: 0 }}
                 primary={
-                  <Typography variant="body1" disableGutters>
+                  <Typography variant="body1">
                     <strong>{instruction.title}</strong>
                     {instruction.description && ": "}
                     {instruction.description}

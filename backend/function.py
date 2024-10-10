@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import db, Language, Question, Answer
+from models import db, Language, Question, Answer, LLMError
 from config import config
 from langchain_core.runnables import RunnableParallel
 import random
@@ -34,7 +34,7 @@ def insert_question(title, content, language, source_language, target_language, 
     return question.id
 
 
-def insert_answer(content, model, question_id) -> int:
+def insert_answer(content, model, question_id, order=-1) -> int:
     """
     Add an answer to the database
     :param content: the answer content
@@ -46,7 +46,8 @@ def insert_answer(content, model, question_id) -> int:
     answer = Answer(
         content=content,
         model=model,
-        question_id=question_id
+        question_id=question_id,
+        frontend_order=order,
     )
 
     db.session.add(answer)
@@ -79,22 +80,36 @@ def get_answers_from_models(content, language, source_language, target_language,
     else:
         input_data["language"] = language
         input_data["content"] = content
+
     # Run all chain in parallel
     parallel_runnable = task_template | config.LLM_CHAINS
     llm_responses = parallel_runnable.invoke(input_data)
-    for model_id, llm_response in llm_responses.items():
-        answer = llm_response.content
 
-        response = {}
-        answer_id = insert_answer(answer, model_id, question_id)
-        response['model'] = config.LLM_ID_NAME[model_id]
-        response['answer'] = answer
-        response['answer_id'] = answer_id
-        responses.append(response)
+    for model_id, _ in config.LLM_CHAINS.items():
+        if model_id not in llm_responses:
+            # LLM Error has occured
+            llmError = LLMError(
+                question_id=question_id,
+                model_id=model_id,
+                prompt=task_template.format(**input_data),
+                error="Something went wrong during LLM call",
+            )
+            db.session.add(llmError)
+            db.session.commit()
+        else:
+            answer = llm_responses[model_id].content
+
+            response = {}
+            response['model_name'] = config.LLM_ID_NAME[model_id]
+            response['model_id'] = model_id
+            response['answer'] = answer
+            responses.append(response)
 
     random.shuffle(responses)
     for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
-        response['model'] = f"model {chr(idx)}"
+        response['model'] = f"model {chr(idx)}" # name displayed at frontend
+        answer_id = insert_answer(answer, model_id, question_id, order=idx-65)
+        response['answer_id'] = answer_id
         
     return responses
 
