@@ -7,6 +7,7 @@ import SearchPage from './SearchPage';
 import AboutUsPage from './AboutUsPage';
 import DisclaimerPopup from './DisclaimerPopup';
 import Navbar from './NavBar';
+import Leaderboard from './Leaderboard';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/result/:questionId" element={<div>Question Detail Page</div>} /> {/* Placeholder for question detail */}
           <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/Leaderboard" element={<Leaderboard />} />
         </Routes>
       </Router>
     </>
