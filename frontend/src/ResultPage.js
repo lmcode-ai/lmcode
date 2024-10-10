@@ -2,27 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
-import { python } from '@codemirror/lang-python';
-import { java } from '@codemirror/lang-java';
-import { cpp } from '@codemirror/lang-cpp';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
 import { Container, Box, Typography, Button, Card, CardContent } from '@mui/material';
 import AnswerCard from './AnswerCard';
-
-const languageExtensions = {
-  Python: python,
-  Java: java,
-  C: cpp,
-};
+import { languageExtensions, defaultLanguage } from './code/constants';
 
 const ResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { title, task, language, sourceLanguage, targetLanguage, content } = location.state.taskDetails;
-
-  if (!languageExtensions[language] || !languageExtensions[sourceLanguage] || !languageExtensions[targetLanguage]) {
-    throw new Error('Invalid language selected: ' + language + ', ' + sourceLanguage + ', ' + targetLanguage);
-  }
 
   if (typeof content !== 'string') {
     throw new Error('Invalid code: ' + content);
@@ -116,7 +104,7 @@ const ResultPage = () => {
       doc: content,
       extensions: [
         basicSetup,
-        languageExtensions[task === 'Code Translation' ? sourceLanguage : language](),
+        (languageExtensions[task === 'Code Translation' ? sourceLanguage : language] ?? defaultLanguage)(),
         quietlight,
         EditorView.editable.of(false),
       ],

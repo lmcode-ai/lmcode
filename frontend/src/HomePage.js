@@ -5,7 +5,7 @@ import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent,
 // import SearchIcon from '@mui/icons-material/Search'; // Import the Search icon
 import TaskSelection from './TaskSelection';
 import LanguageSelection from './LanguageSelection';
-import CodeEditor from './CodeEditor';
+import CodeEditor from './code/CodeEditor';
 import TaskDescription from './TaskDescription';
 import InstructionsCard from './InstructionsCard';
 

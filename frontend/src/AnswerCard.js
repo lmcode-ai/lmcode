@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Typography, Box, IconButton, Divider, Tooltip } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
-import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy icon
-import CodeBlock from './CodeBlock'; // Adjust the path as necessary
+import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
 import ErrorReportDialog from './ErrorReportDialog'; // Adjust the path as necessary
 
 const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVote, onAccept, onReject, onReport }) => {

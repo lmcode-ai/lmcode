@@ -7,12 +7,14 @@ import SearchPage from './SearchPage';
 import AboutUsPage from './AboutUsPage';
 import DisclaimerPopup from './DisclaimerPopup';
 import Navbar from './NavBar';
+import { Provider } from 'react-redux';
+import store from './redux/store';
 import Leaderboard from './Leaderboard';
 
 function App() {
   return (
     // <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-    <>
+    <Provider store={store}>
       <DisclaimerPopup />
       <Router>
         <Navbar />
@@ -25,7 +27,7 @@ function App() {
           <Route path="/Leaderboard" element={<Leaderboard />} />
         </Routes>
       </Router>
-    </>
+    </Provider>
     // </GoogleOAuthProvider>
   );
 }

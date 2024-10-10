@@ -20,7 +20,7 @@ const InstructionsCard = () => {
         </Typography>
         <List sx={{ pb: 0 }} dense>
           {instructions.map((instruction, index) => (
-            <ListItem key={index} disableGutters alignItems="flex-start">
+            <ListItem key={index} alignItems="flex-start">
               <ListItemIcon sx={{ minWidth: "2ch", m: 0 }}>
                 <Typography variant="body1">
                   <strong>{index + 1}.</strong>
@@ -29,7 +29,7 @@ const InstructionsCard = () => {
               <ListItemText
                 sx={{ m: 0 }}
                 primary={
-                  <Typography variant="body1" disableGutters>
+                  <Typography variant="body1">
                     <strong>{instruction.title}</strong>
                     {instruction.description && ": "}
                     {instruction.description}
