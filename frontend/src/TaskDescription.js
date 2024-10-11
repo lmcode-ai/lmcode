@@ -94,7 +94,8 @@ Output: [0,1]`,
             return [num_map[complement], i]
         
         # Otherwise, store the current number with its index in the dictionary
-        num_map[num] = i`,
+        num_map[num] = i
+    return num_map`,
     },
   }
 };
