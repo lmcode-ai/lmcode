@@ -5,6 +5,7 @@ import os
 import function
 from config import config
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def create_app():
@@ -35,25 +36,35 @@ def add_language():
     data = request.get_json()
     language_name = data.get('language')
     logging.info(f"<add_language> request: {request.get_json()}")
+
     if not language_name:
         err_msg = 'Language name is required'
         logging.error(f"<add_language> error: {err_msg}")
         return jsonify({'error': err_msg}), 400
 
-    language = Language.query.filter_by(name=language_name).first()
+    try:
+        language = Language.query.filter_by(name=language_name).first()
 
-    if language:
-        language.count += 1
-        logging.info(f"<add_language> {language_name} exists. Incremented count to {language.count}.")
-    else:
-        language = Language(name=language_name)
-        db.session.add(language)
-        logging.info(f"<add_language> added new language: {language_name}")
+        if language:
+            language.count += 1
+            logging.info(f"<add_language> {language_name} exists. Incremented count to {language.count}.")
+        else:
+            language = Language(name=language_name)
+            db.session.add(language)
+            logging.info(f"<add_language> added new language: {language_name}")
 
-    db.session.commit()
-    logging.info(f"<add_language> database commit successful for language: {language_name}")
+        db.session.commit()
+        logging.info(f"<add_language> database commit successful for language: {language_name}")
 
-    return jsonify({'message': 'Language added/updated successfully'})
+        return jsonify({'message': 'Language added/updated successfully'}), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"<add_language> Error in add language: {err_msg}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        db.session.close()
 
 
 @app.route('/api/questions/handle', methods=['POST'])
@@ -91,11 +102,13 @@ def handle_questions():
         #     },
         # ]
 
-        return jsonify(response)
+        return jsonify(response), 200
     except Exception as e:
         err_msg = str(e)
         logging.error(f"<handle_questions> Error in handle_questions: {err_msg}")
         return jsonify({'error': err_msg}), 500
+    finally:
+        db.session.close()
 
 
 @app.route("/api/answers/accept", methods=['POST'])
@@ -109,14 +122,23 @@ def accept_answer():
     """
     data = request.get_json()
     answer_id = data.get('answer_id')
-    function.update_answer(answer_id, 1, 0)
 
-    # Mark all feedback as inactive when the answer is accepted
-    Feedback.query.filter_by(answer_id=answer_id).update({'active': False})
-    # Commit the changes to the database
-    db.session.commit()
+    try:
+        function.update_answer(answer_id, 1, 0)
+        # Mark all feedback as inactive when the answer is accepted
+        Feedback.query.filter_by(answer_id=answer_id).update({'active': False})
+        # Commit the changes to the database
+        db.session.commit()
+        return jsonify({"message": "Accept successfully"}), 200
 
-    return jsonify({'message': 'Accept successfully'})
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"<accept_answer> Error in accept for {answer_id}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        db.session.close()
+
 
 @app.route("/api/answers/unaccept", methods=['POST'])
 def unaccept_answer():
@@ -128,8 +150,18 @@ def unaccept_answer():
     """
     data = request.get_json()
     answer_id = data.get('answer_id')
-    function.update_answer(answer_id, -1, 0)
-    return jsonify({'message': 'Unaccept successfully'})
+
+    try:
+        function.update_answer(answer_id, -1, 0)
+        return jsonify({"message": "Unaccept successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"<unaccept_answer> Error in unaccept for {answer_id}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        db.session.close()
 
 @app.route("/api/answers/reject", methods=['POST'])
 def reject_answer():
@@ -142,14 +174,24 @@ def reject_answer():
     """
     data = request.get_json()
     answer_id = data.get('answer_id')
-    function.update_answer(answer_id, 0, 1)
 
-    # Mark all feedback as active when the answer is rejected
-    Feedback.query.filter_by(answer_id=answer_id).update({'active': True})
-    # Commit the changes to the database
-    db.session.commit()
+    try:
+        function.update_answer(answer_id, 0, 1)
 
-    return jsonify({'message': 'Reject successfully'})
+        # Mark all feedback as active when the answer is rejected
+        Feedback.query.filter_by(answer_id=answer_id).update({'active': True})
+        # Commit the changes to the database
+        db.session.commit()
+
+        return jsonify({"message": "Reject successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"<reject_answer> Error in reject for {answer_id}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        db.session.close()
 
 @app.route("/api/answers/unreject", methods=['POST'])
 def unreject_answer():
@@ -161,8 +203,18 @@ def unreject_answer():
     """
     data = request.get_json()
     answer_id = data.get('answer_id')
-    function.update_answer(answer_id, 0, -1)
-    return jsonify({'message': 'Unreject successfully'})
+
+    try:
+        function.update_answer(answer_id, 0, -1)
+        return jsonify({"message": "Unreject successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"<unreject_answer> Error in unreject for {answer_id}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        db.session.close()
 
 
 @app.route("/api/answers/feedback", methods=['POST'])
@@ -174,26 +226,34 @@ def upsert_feedback():
     answer_id = data.get('answer_id')
     predefined_feedbacks = data.get('predefined_feedbacks')
     text_feedback = data.get('text_feedback')
+    try:
+        feedback = Feedback.query.filter_by(answer_id=answer_id).first()
 
-    feedback = Feedback.query.filter_by(answer_id=answer_id).first()
+        if feedback:
+            # If feedback exists, update the existing record
+            feedback.predefined_feedbacks = predefined_feedbacks
+            feedback.text_feedback = text_feedback
+        else:
+            # If no feedback exists, create a new feedback record
+            feedback = Feedback(
+                predefined_feedbacks=predefined_feedbacks,
+                text_feedback=text_feedback,
+                answer_id=answer_id,
+                active=True,
+            )
+            db.session.add(feedback)
 
-    if feedback:
-        # If feedback exists, update the existing record
-        feedback.predefined_feedbacks = predefined_feedbacks
-        feedback.text_feedback = text_feedback
-    else:
-        # If no feedback exists, create a new feedback record
-        feedback = Feedback(
-            predefined_feedbacks=predefined_feedbacks,
-            text_feedback=text_feedback,
-            answer_id=answer_id,
-            active=True,
-        )
-        db.session.add(feedback)
+        db.session.commit()
 
-    db.session.commit()
-    return jsonify({'message': 'Feedback added successfully'})
+        return jsonify({'message': 'Feedback upserted successfully'}), 200
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"<handle_questions> Error in upseting feedback for {answer_id}: {e}")
+        return jsonify({'error': 'Database operation failed'}), 500
 
+    finally:
+        db.session.close()
 
 # @app.route("/api/questions/search", methods=['GET'])
 # def search_questions():

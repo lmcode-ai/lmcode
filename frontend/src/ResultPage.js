@@ -17,6 +17,15 @@ const ResultPage = () => {
   }
 
   const [answers, setAnswers] = useState([{ content: 'Loading...' }]);
+  // each answer state is of structure: 
+  /**     id: the answer id
+          model: masked model name
+          model_name: actual model name
+          content: answer
+          accepted: accepted flag
+          rejected: rejected flag
+   * 
+   */
 
   const makeApiRequestAndCheckStatus = (endpoint, method, body) => {
     return fetch(endpoint, {
@@ -68,7 +77,6 @@ const ResultPage = () => {
           content: answer.answer,
           accepted: false,
           rejected: false,
-          reported: false,
         }));
         setAnswers(fetchedAnswers);
       } catch (error) {
@@ -210,6 +218,8 @@ const ResultPage = () => {
           <AnswerCard
             key={index}
             index={index}
+            model={answer.model}
+            model_name={answer.model_name}
             answer={answer.content}
             accepted={answer.accepted}
             rejected={answer.rejected}
