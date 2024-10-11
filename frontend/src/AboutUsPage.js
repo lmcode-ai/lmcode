@@ -1,17 +1,22 @@
 import React from 'react';
 import { Container, Grid, Typography, Card, CardContent, CardMedia, Box, Link } from '@mui/material';
 
-import alvin from './assets/images/profile-pics/alvin.jpg';
+import candice from './assets/images/profile-pics/candice.jpg';
+import colin from './assets/images/profile-pics/colin.png';
+import jie from './assets/images/profile-pics/jie.jpg';
+import letian from './assets/images/profile-pics/letian.jpg';
+import linyuan from './assets/images/profile-pics/linyuan.jpg';
 import sahil from './assets/images/profile-pics/sahil.jpg';
+import alvin from './assets/images/profile-pics/alvin.jpg';
+
 import { disclaimerText } from './constants';
 
-// Sample images for contributors
 const contributors = [
-  { name: 'Candice Yang', image: 'https://via.placeholder.com/100' },
-  { name: 'Colin Cai', image: 'https://via.placeholder.com/100' },
-  { name: 'Jie Qiu', image: 'https://via.placeholder.com/100' },
-  { name: 'Letian Cheng', image: 'https://via.placeholder.com/100' },
-  { name: 'Linyuan Gong', image: 'https://via.placeholder.com/100' },
+  { name: 'Candice Yang', image: candice },
+  { name: 'Colin Cai', image: colin },
+  { name: 'Jie Qiu', image: jie },
+  { name: 'Letian Cheng', image: letian },
+  { name: 'Linyuan Gong', image: linyuan },
   { name: 'Sahil Bhatia', image: sahil },
   { name: 'Alvin Cheung', image: alvin },
 ];

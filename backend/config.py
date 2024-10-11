@@ -1,6 +1,5 @@
 import os
 import yaml
-import warnings
 from dotenv import load_dotenv
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_openai import ChatOpenAI
@@ -8,7 +7,6 @@ from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_google_vertexai import ChatVertexAI
-from vertexai.preview import reasoning_engines
 import vertexai
 import logging
 from logging.handlers import RotatingFileHandler
@@ -24,7 +22,7 @@ class Config:
 
         # Instance path as directory
         self.INSTANCE_PATH = config_data.get("instance", {}).get("path", "instance")
-        os.makedirs(self.INSTANCE_PATH, exist_ok=True) 
+        os.makedirs(self.INSTANCE_PATH, exist_ok=True)
 
         # Database settings
         self.SQLALCHEMY_DATABASE_URI = config_data.get("database", {}).get(
@@ -45,15 +43,15 @@ class Config:
             log_handler = logging.StreamHandler()
         else:
             log_handler = RotatingFileHandler(self.LOGFILE, maxBytes=10000, backupCount=3)
-            
-        log_handler.setLevel(logging.INFO) 
+
+        log_handler.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         log_handler.setFormatter(formatter)
 
         root_logger = logging.getLogger()
         root_logger.addHandler(log_handler)
-        root_logger.setLevel(logging.INFO) 
+        root_logger.setLevel(logging.INFO)
 
         # API Keys
         self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
