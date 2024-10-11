@@ -20,7 +20,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@uiw/codemirror-theme-quietlight": "^4.22.2",
     "@uiw/react-codemirror": "^4.22.2",
-    "axios": "^1.7.2",
+    "axios": "^1.7.7",
     "cors": "^2.8.5",
     "lmcode": "file:",
     "loglevel": "^1.9.1",
