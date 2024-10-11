@@ -23,8 +23,8 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
     }
   };
 
-  const handleReportSubmit = (textFeedback) => {
-    onReport(index, textFeedback);
+  const handleReportSubmit = (predefinedFeedbacks, textFeedback) => {
+    onReport(index, predefinedFeedbacks, textFeedback);
     setReportDialogOpen(false);
     onReject(index);
   };

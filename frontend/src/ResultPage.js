@@ -92,9 +92,9 @@ const ResultPage = () => {
     setAcceptedAnswer((prev) => (prev === index ? null : prev));
   };
 
-  const handleReport = (index, errorFeedback) => {
-    console.log(`Reported error for answer ${index}: ${errorFeedback}`);
-
+  const handleReport = (index, predefinedFeedbacks, textFeedback) => {
+    console.log(`Report answer ${index} with predefined feedbacks: ${predefinedFeedbacks}`);
+    console.log(`Additional optional feedback for answer ${index}: ${textFeedback}`);
   };
 
   const editorRef = useRef();
