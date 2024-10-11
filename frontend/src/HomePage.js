@@ -1,34 +1,46 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, InputAdornment } from '@mui/material';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField,
+} from "@mui/material";
 // import { GoogleLogin } from '@react-oauth/google'; // Import the new GoogleLogin button
 // import SearchIcon from '@mui/icons-material/Search'; // Import the Search icon
-import TaskSelection from './TaskSelection';
-import LanguageSelection from './LanguageSelection';
-import CodeEditor from './CodeEditor';
-import TaskDescription from './TaskDescription';
+import TaskSelection from "./TaskSelection";
+import LanguageSelection from "./LanguageSelection";
+import CodeEditor from "./CodeEditor";
+import TaskDescription from "./TaskDescription";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [task, setTask] = useState('Code Completion');
-  const [language, setLanguage] = useState('Python');
-  const [sourceLanguage, setSourceLanguage] = useState('Python');
-  const [targetLanguage, setTargetLanguage] = useState('Java');
-  const [code, setCode] = useState('');
+  const [title, setTitle] = useState("");
+  const [task, setTask] = useState("Code Completion");
+  const [language, setLanguage] = useState("Python");
+  const [sourceLanguage, setSourceLanguage] = useState("Python");
+  const [targetLanguage, setTargetLanguage] = useState("Java");
+  const [examples, setExamples] = useState([{ input: "", output: "" }]);
+  const [code, setCode] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState('');
+  const [dialogMessage, setDialogMessage] = useState("");
   // const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      setDialogMessage('Please enter a title before submitting.');
+      setDialogMessage("Please enter a title before submitting.");
       setOpenDialog(true);
       return;
     }
 
     if (!code.trim()) {
-      setDialogMessage('Please enter some code before submitting.');
+      setDialogMessage("Please enter some code before submitting.");
       setOpenDialog(true);
       return;
     }
@@ -42,11 +54,25 @@ const HomePage = () => {
       content: code,
     };
 
-    navigate('/result', { state: { taskDetails } });
+    navigate("/result", { state: { taskDetails } });
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+  };
+
+  const addExample = () => {
+    setExamples([...examples, { input: "", output: "" }]);
+  };
+
+  const deleteExample = () => {
+    setExamples(examples.slice(0, -1));
+  };
+
+  const handleExampleChange = (index, field, value) => {
+    const newExamples = [...examples];
+    newExamples[index][field] = value;
+    setExamples(newExamples);
   };
 
   // const handleSearch = (e) => {
@@ -103,17 +129,81 @@ const HomePage = () => {
         <TaskSelection task={task} setTask={setTask} />
         <TaskDescription task={task} />
         <>
-          {(task === 'Code Translation') ? (
+          {task === "Code Translation" ? (
             <>
-              <LanguageSelection label="Source Language" language={sourceLanguage} setLanguage={setSourceLanguage} />
-              <LanguageSelection label="Target Language" language={targetLanguage} setLanguage={setTargetLanguage} />
+              <LanguageSelection
+                label="Source Language"
+                language={sourceLanguage}
+                setLanguage={setSourceLanguage}
+              />
+              <LanguageSelection
+                label="Target Language"
+                language={targetLanguage}
+                setLanguage={setTargetLanguage}
+              />
             </>
           ) : (
-            task !== 'Text-to-Code Generation' && (
-              <LanguageSelection label="Choose Language" language={language} setLanguage={setLanguage} />
+            task !== "Text-to-Code Generation" &&
+            task !== "Input/Output Examples" && (
+              <LanguageSelection
+                label="Choose Language"
+                language={language}
+                setLanguage={setLanguage}
+              />
             )
           )}
-          <CodeEditor language={task === 'Code Translation' ? sourceLanguage : language} code={code} setCode={setCode} />
+          {task !== "Input/Output Examples" ? (
+            <CodeEditor
+              language={task === "Code Translation" ? sourceLanguage : language}
+              code={code}
+              setCode={setCode}
+            />
+          ) : (
+            <>
+              {examples.map((example, index) => (
+                <Box key={index} sx={{ mb: 2 }}>
+                  <TextField
+                    label={`Example Input ${index + 1}`}
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={example.input}
+                    onChange={(e) =>
+                      handleExampleChange(index, "input", e.target.value)
+                    }
+                  />
+                  <TextField
+                    label={`Example Output ${index + 1}`}
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={example.output}
+                    onChange={(e) =>
+                      handleExampleChange(index, "output", e.target.value)
+                    }
+                  />
+                </Box>
+              ))}
+              <Button
+                variant="contained"
+                onClick={addExample}
+                sx={{ backgroundColor: "white", color: "black" }}
+              >
+                Add Example
+              </Button>
+              {examples.length > 1 && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={deleteExample}
+                  sx={{ ml: 2, backgroundColor: "white", color: "black" }}
+                >
+                  Delete Last Example
+                </Button>
+              )}
+              <Box sx={{ mt: 4 }} />
+            </>
+          )}
         </>
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Submit
@@ -122,9 +212,7 @@ const HomePage = () => {
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Missing Input</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {dialogMessage}
-          </DialogContentText>
+          <DialogContentText>{dialogMessage}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
