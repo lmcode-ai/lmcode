@@ -40,11 +40,16 @@ const HomePage = () => {
       return;
     }
 
-    if (!code.trim()) {
+    if (!code.trim() && task !== "Input/Output Examples") {
       setDialogMessage("Please enter some code before submitting.");
       setOpenDialog(true);
       return;
     }
+
+    // Convert examples to a string format
+    const examplesString = examples.map(example =>
+      `Input: ${example.input}\nOutput: ${example.output}`
+    ).join('\n\n'); // Join with double newlines for separation
 
     const taskDetails = {
       title,
@@ -52,7 +57,7 @@ const HomePage = () => {
       language,
       sourceLanguage,
       targetLanguage,
-      content: code,
+      content: task === "Input/Output Examples" ? examplesString : code,
     };
 
     navigate("/result", { state: { taskDetails } });
@@ -144,8 +149,8 @@ const HomePage = () => {
               />
             </>
           ) : (
-            task !== "Text-to-Code Generation" &&
-            task !== "Input/Output Examples" && (
+            task !== "Text-to-Code Generation"
+            && (
               <LanguageSelection
                 label="Choose Language"
                 language={language}
