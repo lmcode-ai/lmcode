@@ -16,13 +16,27 @@ const ResultPage = () => {
     throw new Error('Invalid code: ' + content);
   }
 
-  const initialCounts = [0, 0, 0, 0];
-  const [voteCounts, setVoteCounts] = useState(initialCounts);
-  const [voted, setVoted] = useState([null, null, null, null]);
-  const [acceptedAnswer, setAcceptedAnswer] = useState(null);
-  const [rejectedAnswers, setRejectedAnswers] = useState([false, false, false, false]);
-  const [answers, setAnswers] = useState(['Loading...', 'Loading...', 'Loading...', 'Loading...']);
+  const [answers, setAnswers] = useState([{ content: 'Loading...' }]);
 
+  const makeApiRequestAndCheckStatus = (endpoint, method, body) => {
+    return fetch(endpoint, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to ${method} at ${endpoint}`);
+        }
+        return response.json();
+      })
+      .catch((error) => {
+        console.error(`Error during ${method} request to ${endpoint}:`, error);
+      });
+  };
+  
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
@@ -47,55 +61,106 @@ const ResultPage = () => {
 
         const data = await response.json();
         // Extract the answers from the response and update the state
-        const fetchedAnswers = data.map(answer => `${answer.model}: ${answer.answer}`);
+        const fetchedAnswers = data.map(answer => ({
+          id: answer.id,
+          model: answer.model,
+          model_name: answer.model_name,
+          content: answer.answer,
+          accepted: false,
+          rejected: false,
+          reported: false,
+        }));
         setAnswers(fetchedAnswers);
       } catch (error) {
         console.error('Error fetching answers:', error);
-        setAnswers(['Error loading answers', 'Error loading answers', 'Error loading answers', 'Error loading answers']);
+        setAnswers([{ content: 'Error loading answers' }]);
       }
     };
 
     fetchAnswers();
   }, [title, content, language, sourceLanguage, targetLanguage, task]);
 
-  const handleVote = (index, type) => {
-    const newCounts = [...voteCounts];
-    const newVoted = [...voted];
-    if (type === 'upvote') {
-      if (newVoted[index] === 'upvoted') {
-        newCounts[index] -= 1;
-        newVoted[index] = null;
-      } else {
-        newCounts[index] += newVoted[index] === 'downvoted' ? 2 : 1;
-        newVoted[index] = 'upvoted';
-      }
-    } else if (type === 'downvote') {
-      if (newVoted[index] === 'downvoted') {
-        newCounts[index] += 1;
-        newVoted[index] = null;
-      } else {
-        newCounts[index] -= newVoted[index] === 'upvoted' ? 2 : 1;
-        newVoted[index] = 'downvoted';
-      }
-    }
-    setVoteCounts(newCounts);
-    setVoted(newVoted);
-  };
 
   const handleAccept = (index) => {
-    setAcceptedAnswer((prev) => (prev === index ? null : index));
-    setRejectedAnswers((prev) => prev.map((_, i) => (i === index ? false : prev[i])));
+    setAnswers((prevAnswers) => {
+      return prevAnswers.map((answer, i) => {
+        if (i === index) {
+          if (!answer.accepted) {
+            // If the answer was not accepted before, accept it
+            makeApiRequestAndCheckStatus('/api/answers/accept', 'POST', { answer_id: answer.id });
+            
+            if (answer.rejected) {
+              // Ensure rejection is undone if the answer is accepted
+              makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
+            }
+            
+          } else {
+            // If already accepted and toggled off, undo the accept
+            makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
+          }
+
+          // Toggle accepted status
+          return { ...answer, accepted: !answer.accepted, rejected: false };
+        }
+        return answer;
+      });
+    });
   };
+
 
   const handleReject = (index) => {
-    setRejectedAnswers((prev) => prev.map((val, i) => (i === index ? !val : val)));
-    setAcceptedAnswer((prev) => (prev === index ? null : prev));
-  };
+  setAnswers((prevAnswers) => {
+    return prevAnswers.map((answer, i) => {
+      if (i === index) {
+        if (!answer.rejected) {
+          // If the answer was not rejected before, reject it
+              makeApiRequestAndCheckStatus('/api/answers/reject', 'POST', { answer_id: answer.id });
+
+          if (answer.accepted) {
+            // Ensure acceptance is undone if the answer is rejected
+            makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
+          }
+
+        } else {
+          // If already rejected and toggled off, undo the reject
+          makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
+        }
+
+        // Toggle the rejected state
+        return { ...answer, rejected: !answer.rejected, accepted: false };
+      }
+      return answer;
+    });
+  });
+};
 
   const handleReport = (index, predefinedFeedbacks, textFeedback) => {
-    console.log(`Report answer ${index} with predefined feedbacks: ${predefinedFeedbacks}`);
-    console.log(`Additional optional feedback for answer ${index}: ${textFeedback}`);
+
+    fetch(`/api/answers/feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        answer_id: answers[index].id,
+        predefined_feedbacks: predefinedFeedbacks,
+        text_feedback: textFeedback,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to submit report');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Report submitted successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error submitting report:', error);
+      });
   };
+
 
   const editorRef = useRef();
 
@@ -145,12 +210,9 @@ const ResultPage = () => {
           <AnswerCard
             key={index}
             index={index}
-            answer={answer}
-            voteCount={voteCounts[index]}
-            voted={voted[index]}
-            accepted={acceptedAnswer === index}
-            rejected={rejectedAnswers[index]}
-            onVote={handleVote}
+            answer={answer.content}
+            accepted={answer.accepted}
+            rejected={answer.rejected}
             onAccept={handleAccept}
             onReject={handleReject}
             onReport={handleReport}

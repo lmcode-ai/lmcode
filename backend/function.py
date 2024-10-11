@@ -114,20 +114,20 @@ def get_answers_from_models(content, language, source_language, target_language,
     return responses
 
 
-def update_answer(answer_id: int, upvote_i, downvote_i) -> None:
+def update_answer(answer_id: int, upvote_change, downvote_change) -> None:
     """
     Update the upvotes and downvotes of an answer
     :param answer_id: the id of the answer
-    :param upvote_i: the number of upvotes to add
-    :param downvote_i: the number of downvotes to add
+    :param upvote_i: the number of upvotes changed
+    :param downvote_i: the number of downvotes changed
     :return: None
     """
 
     answer = Answer.query.get(answer_id)
     if not answer:
         raise Exception("update_answer: Answer not found")
-    answer.upvotes += upvote_i
-    answer.downvotes += downvote_i
+    answer.upvotes += upvote_change
+    answer.downvotes += downvote_change
 
     db.session.commit()
 

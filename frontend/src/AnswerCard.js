@@ -7,7 +7,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy ic
 import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
 import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
 
-const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVote, onAccept, onReject, onReport }) => {
+const AnswerCard = ({ index, answer, accepted, rejected, onAccept, onReject, onReport }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleAccept = () => {

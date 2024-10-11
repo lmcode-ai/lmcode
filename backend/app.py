@@ -80,29 +80,17 @@ def handle_questions():
         
         logging.info(f"<handle_questions> llm response: {response}")
 
-        # MOCK RESPONSE
+        # RESPONSE FORMAT
         # response = [
         #     {
-        #         'model': 'model 1',
-        #         'answer': 'answer 1',
-        #         'answer_id': 1
+        #         'model': '',
+        #         'model_name': '',
+        #         'model_id': 0,
+        #         'answer': '',
+        #         'answer_id': 0,        
         #     },
-        #     {
-        #         'model': 'model 2',
-        #         'answer': 'answer 2',
-        #         'answer_id': 2
-        #     },
-        #     {
-        #         'model': 'model 3',
-        #         'answer': 'answer 3',
-        #         'answer_id': 3
-        #     },
-        #     {
-        #         'model': 'model 4',
-        #         'answer': 'answer 4',
-        #         'answer_id': 4
-        #     }
         # ]
+
         return jsonify(response)
     except Exception as e:
         err_msg = str(e)
@@ -110,58 +98,99 @@ def handle_questions():
         return jsonify({'error': err_msg}), 500
 
 
-@app.route("/api/answers/update", methods=['POST'])
-def update_answer():
-    """
-    update the answer in the database
-    """
-    data = request.get_json()
-    answer_id = data.get('answer_id')
-    upvotes_increment = data.get('upvotes_increment')
-    downvotes_increment = data.get('downvotes_increment')
-    function.update_answer(answer_id, upvotes_increment, downvotes_increment)
-
-
 @app.route("/api/answers/accept", methods=['POST'])
 def accept_answer():
     """
-    accept the answer in the database
+    accept the answer in the database. 
+    marks any feedback related to be INACTIVE.
+
+    accept is tranlated to number of upvotes.
+    reject is tranlated to number of downvotes.
     """
-    try:
-        data = request.get_json()
-        answer_id = data.get('answer_id')
-        answer = Answer.query.get(answer_id)
-        if not answer:
-            err_msg = "Answer not found"
-            logging.error(f"<accept_answer> error: {err_msg}")
-            return jsonify({'error': err_msg}), 404
-        question = Question.query.get(answer.question_id)
-        if not question:
-            err_msg = "Question not found"
-            logging.error(f"<accept_answer> error: {err_msg}")
-            return jsonify({'error': err_msg}), 404
-        question.accepted_answer_id = answer_id
-        db.session.commit()
-        return jsonify({'message': 'Answer accepted successfully'})
-    except Exception as e:
-        err_msg = str(e)
-        logging.error(f"<accept_answer> error: {err_msg}")
-        return jsonify({'error': err_msg}), 500
+    data = request.get_json()
+    answer_id = data.get('answer_id')
+    function.update_answer(answer_id, 1, 0)
+
+    # Mark all feedback as inactive when the answer is accepted
+    Feedback.query.filter_by(answer_id=answer_id).update({'active': False})
+    # Commit the changes to the database
+    db.session.commit()
+
+    return jsonify({'message': 'Accept successfully'})
+
+@app.route("/api/answers/unaccept", methods=['POST'])
+def unaccept_answer():
+    """
+    unaccept the answer in the database.
+
+    accept is tranlated to number of upvotes.
+    reject is tranlated to number of downvotes.
+    """
+    data = request.get_json()
+    answer_id = data.get('answer_id')
+    function.update_answer(answer_id, -1, 0)
+    return jsonify({'message': 'Unaccept successfully'})
+
+@app.route("/api/answers/reject", methods=['POST'])
+def reject_answer():
+    """
+    reject the answer in the database.
+    mark all feedback related to ACTIVE
+
+    accept is tranlated to number of upvotes.
+    reject is tranlated to number of downvotes.
+    """
+    data = request.get_json()
+    answer_id = data.get('answer_id')
+    function.update_answer(answer_id, 0, 1)
+
+    # Mark all feedback as active when the answer is rejected
+    Feedback.query.filter_by(answer_id=answer_id).update({'active': True})
+    # Commit the changes to the database
+    db.session.commit()
+
+    return jsonify({'message': 'Reject successfully'})
+
+@app.route("/api/answers/unreject", methods=['POST'])
+def unreject_answer():
+    """
+    unreject the answer in the database.
+
+    accept is tranlated to number of upvotes.
+    reject is tranlated to number of downvotes.
+    """
+    data = request.get_json()
+    answer_id = data.get('answer_id')
+    function.update_answer(answer_id, 0, -1)
+    return jsonify({'message': 'Unreject successfully'})
 
 
 @app.route("/api/answers/feedback", methods=['POST'])
 def upsert_feedback():
     """
-    add feedback for the answer in the database
+    add feedback for the answer in the database or update it if exists
     """
     data = request.get_json()
     answer_id = data.get('answer_id')
-    feedback_kind = data.get('feedback')
-    feedback = Feedback(
-        feedback=feedback_kind,
-        answer_id=answer_id
-    )
-    db.session.add(feedback)
+    predefined_feedbacks = data.get('predefined_feedbacks')
+    text_feedback = data.get('text_feedback')
+
+    feedback = Feedback.query.filter_by(answer_id=answer_id).first()
+
+    if feedback:
+        # If feedback exists, update the existing record
+        feedback.predefined_feedbacks = predefined_feedbacks
+        feedback.text_feedback = text_feedback
+    else:
+        # If no feedback exists, create a new feedback record
+        feedback = Feedback(
+            predefined_feedbacks=predefined_feedbacks,
+            text_feedback=text_feedback,
+            answer_id=answer_id,
+            active=True,
+        )
+        db.session.add(feedback)
+
     db.session.commit()
     return jsonify({'message': 'Feedback added successfully'})
 

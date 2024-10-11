@@ -42,17 +42,18 @@ class Answer(db.Model):
 
 
 class Feedback(db.Model):
-    # feedback of wrong answers
+    # feedback to LLM answer
     id = db.Column(db.Integer, primary_key=True)
-    feedback = db.Column(db.String, nullable=False)
+    predefined_feedbacks = db.Column(db.JSON, nullable=False)  # Store array as JSON
+    text_feedback = db.Column(db.String, nullable=True)  # Optional text feedback
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     answer_id = db.Column(db.Integer, db.ForeignKey('answer.id'), nullable=False)
     answer = db.relationship('Answer', backref=db.backref('feedbacks', lazy=True), foreign_keys=[answer_id])
-
+    active = db.Column(db.Boolean, default=True, nullable=False)
 
 class LLMError(db.Model):
-    # feedback of LLM not generating an answer
+    # log of LLM not generating an answer
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     model_id = db.Column(db.String, nullable=False)
