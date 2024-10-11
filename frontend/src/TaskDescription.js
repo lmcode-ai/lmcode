@@ -30,7 +30,7 @@ const taskDescriptions = {
     outputDescription: 'the translated code snippet in the target language',
     example: {
       language: 'python -> java',
-      input: `# Given a Python script that reads a file:\n\nwith open('example.txt', 'r') as file:\n    content = file.read()\n    print(content)`,
+      input: `with open('example.txt', 'r') as file:\n    content = file.read()\n    print(content)`,
       output: `import java.nio.file.*;\nimport java.io.IOException;\n\npublic class ReadFile {\n    public static void main(String[] args) {\n        try {\n            String content = new String(Files.readAllBytes(Paths.get("example.txt")));\n            System.out.println(content);\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n}`,
     },
   },
@@ -46,10 +46,10 @@ const taskDescriptions = {
   },
   'Text-to-Code Generation': {
     description: 'Generate code via a natural language description.',
-    inputDescription: 'a natural language description of the code',
-    outputDescription: 'the generated code',
+    inputDescription: 'a natural language description of the code to be generated',
+    outputDescription: 'generated code',
     example: {
-      input: `Create a python function to check if a number is even`,
+      input: `Create a python function that checks if a number is even`,
       output: `def is_even(n):\n    return n % 2 == 0`,
     },
   },
