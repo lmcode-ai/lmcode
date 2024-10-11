@@ -7,7 +7,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy ic
 import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
 import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
 
-const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVote, onAccept, onReject, onReport }) => {
+const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAccept, onReject, onReport }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleAccept = () => {
@@ -23,8 +23,8 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
     }
   };
 
-  const handleReportSubmit = (textFeedback) => {
-    onReport(index, textFeedback);
+  const handleReportSubmit = (predefinedFeedbacks, textFeedback) => {
+    onReport(index, predefinedFeedbacks, textFeedback);
     setReportDialogOpen(false);
     onReject(index);
   };
@@ -46,8 +46,8 @@ const AnswerCard = ({ index, answer, voteCount, voted, accepted, rejected, onVot
   };
 
   // Split the answer into model and content
-  const [model, ...answerContent] = answer.split(': ');
-  const displayAnswer = answerContent.join(': ');
+  // const [model, ...answerContent] = answer.split(': ');
+  const displayAnswer = answer
 
   return (
     <Card sx={{ mt: 2 }}>

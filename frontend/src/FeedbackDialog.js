@@ -2,12 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, FormControl, TextField, Chip, Box } from '@mui/material';
 
 const FeedbackDialog = ({ open, onClose, onSubmit }) => {
-  const [selectedBadges, setSelectedBadges] = useState([]);
+  const [selectedPredefinedFeedbacks, setSelectedPredefinedFeedbacks] = useState([]);
   const [textFeedback, setTextFeedback] = useState("");
 
-  const shuffledBadges = useMemo(
+  const shuffledPredefinedFeedbacks = useMemo(
     () => {
-      const badges = [
+      const predefinedFeedbacks = [
         'incorrect output',
         'syntax error',
         'performance issue',
@@ -16,7 +16,7 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
         'misunderstood question',
         'other',
       ];
-      return badges
+      return predefinedFeedbacks
       .map(value => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value)
@@ -25,7 +25,7 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
   );
 
   const handleBadgeClick = (badge) => {
-    setSelectedBadges((prev) =>
+    setSelectedPredefinedFeedbacks((prev) =>
       prev.includes(badge) ? prev.filter((b) => b !== badge) : [...prev, badge]
     );
   };
@@ -35,7 +35,7 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit(textFeedback);
+    onSubmit(selectedPredefinedFeedbacks, textFeedback);
     onClose();
   };
 
@@ -49,12 +49,12 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
       <DialogContent sx={{ pb: 0 }}>
         <FormControl component="fieldset" fullWidth>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', marginBottom: 2 }}>
-            {shuffledBadges.map((badge) => (
+            {shuffledPredefinedFeedbacks.map((badge) => (
               <Chip
                 key={badge}
                 label={badge}
                 onClick={() => handleBadgeClick(badge)}
-                color={selectedBadges.includes(badge) ? 'primary' : 'default'}
+                color={selectedPredefinedFeedbacks.includes(badge) ? 'primary' : 'default'}
                 clickable
               />
             ))}
@@ -72,7 +72,7 @@ const FeedbackDialog = ({ open, onClose, onSubmit }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} disabled={selectedBadges.length === 0}>Submit</Button>
+        <Button onClick={handleSubmit} disabled={selectedPredefinedFeedbacks.length === 0}>Submit</Button>
       </DialogActions>
     </Dialog>
   );
