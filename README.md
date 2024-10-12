@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-- Python 3.6 or higher
+- Python 3.11 or higher
 - Node.js
 - pip
 
@@ -38,7 +38,7 @@ git clone git@github.com:lmcode-ai/lmcode.git
 
 2. Create a new conda environment (Optional)
 ```base 
-conda create --name env_name_here  python=3.9  
+conda create --name env_name_here  python=3.11  
 conda activate env_name_here
 ```
 
