@@ -45,11 +45,11 @@ const ResultPage = () => {
         console.error(`Error during ${method} request to ${endpoint}:`, error);
       });
   };
-  
+
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        const response = await fetch('/api/questions/handle', {
+        const response = await fetch('http://127.0.0.1:5000/api/questions/handle', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,12 +96,12 @@ const ResultPage = () => {
           if (!answer.accepted) {
             // If the answer was not accepted before, accept it
             makeApiRequestAndCheckStatus('/api/answers/accept', 'POST', { answer_id: answer.id });
-            
+
             if (answer.rejected) {
               // Ensure rejection is undone if the answer is accepted
               makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
             }
-            
+
           } else {
             // If already accepted and toggled off, undo the accept
             makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
@@ -117,30 +117,30 @@ const ResultPage = () => {
 
 
   const handleReject = (index) => {
-  setAnswers((prevAnswers) => {
-    return prevAnswers.map((answer, i) => {
-      if (i === index) {
-        if (!answer.rejected) {
-          // If the answer was not rejected before, reject it
-              makeApiRequestAndCheckStatus('/api/answers/reject', 'POST', { answer_id: answer.id });
+    setAnswers((prevAnswers) => {
+      return prevAnswers.map((answer, i) => {
+        if (i === index) {
+          if (!answer.rejected) {
+            // If the answer was not rejected before, reject it
+            makeApiRequestAndCheckStatus('/api/answers/reject', 'POST', { answer_id: answer.id });
 
-          if (answer.accepted) {
-            // Ensure acceptance is undone if the answer is rejected
-            makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
+            if (answer.accepted) {
+              // Ensure acceptance is undone if the answer is rejected
+              makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
+            }
+
+          } else {
+            // If already rejected and toggled off, undo the reject
+            makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
           }
 
-        } else {
-          // If already rejected and toggled off, undo the reject
-          makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
+          // Toggle the rejected state
+          return { ...answer, rejected: !answer.rejected, accepted: false };
         }
-
-        // Toggle the rejected state
-        return { ...answer, rejected: !answer.rejected, accepted: false };
-      }
-      return answer;
+        return answer;
+      });
     });
-  });
-};
+  };
 
   const handleReport = (index, predefinedFeedbacks, textFeedback) => {
 

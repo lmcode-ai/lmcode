@@ -10,11 +10,21 @@ from sqlalchemy.exc import SQLAlchemyError
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app)
+    # CORS(app)
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": ["http://localhost:3000"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization"],
+            }
+        },
+    )
 
     # Configuration for SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI 
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+    app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
 
@@ -29,35 +39,41 @@ def create_app():
 
     return app
 
+
 app = create_app()
 
-@app.route('/api/add_language', methods=['POST'])
+
+@app.route("/api/add_language", methods=["POST"])
 def add_language():
     data = request.get_json()
-    language_name = data.get('language')
+    language_name = data.get("language")
     logging.info(f"<add_language> request: {request.get_json()}")
 
     if not language_name:
-        err_msg = 'Language name is required'
+        err_msg = "Language name is required"
         logging.error(f"<add_language> error: {err_msg}")
-        return jsonify({'error': err_msg}), 400
+        return jsonify({"error": err_msg}), 400
 
     try:
         language = Language.query.filter_by(name=language_name).first()
 
         if language:
             language.count += 1
-            logging.info(f"<add_language> {language_name} exists. Incremented count to {language.count}.")
+            logging.info(
+                f"<add_language> {language_name} exists. Incremented count to {language.count}."
+            )
         else:
             language = Language(name=language_name)
             db.session.add(language)
             logging.info(f"<add_language> added new language: {language_name}")
 
         db.session.commit()
-        logging.info(f"<add_language> database commit successful for language: {language_name}")
+        logging.info(
+            f"<add_language> database commit successful for language: {language_name}"
+        )
 
-        return jsonify({'message': 'Language added/updated successfully'}), 200
-    
+        return jsonify({"message": "Language added/updated successfully"}), 200
+
     except Exception as e:
         db.session.rollback()
         logging.error(f"<add_language> Error in add language: {err_msg}")
@@ -67,7 +83,7 @@ def add_language():
         db.session.close()
 
 
-@app.route('/api/questions/handle', methods=['POST'])
+@app.route("/api/questions/handle", methods=["POST"])
 def handle_questions():
     """
     add the question in the database,
@@ -80,15 +96,30 @@ def handle_questions():
     try:
         ip_address = request.remote_addr
         data = request.get_json()
-        question_title = data.get('title')
-        question_content = data.get('content')
-        language = data.get('language')
-        source_language = data.get('sourceLanguage')
-        target_language = data.get('targetLanguage')
-        task = data.get('task')
-        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
-        response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
-        
+        question_title = data.get("title")
+        question_content = data.get("content")
+        language = data.get("language")
+        source_language = data.get("sourceLanguage")
+        target_language = data.get("targetLanguage")
+        task = data.get("task")
+        question_id = function.insert_question(
+            question_title,
+            question_content,
+            language,
+            source_language,
+            target_language,
+            task,
+            ip_address,
+        )
+        response = function.get_answers_from_models(
+            question_content,
+            language,
+            source_language,
+            target_language,
+            task,
+            question_id,
+        )
+
         logging.info(f"<handle_questions> llm response: {response}")
 
         # RESPONSE FORMAT
@@ -98,7 +129,7 @@ def handle_questions():
         #         'model_name': '',
         #         'model_id': 0,
         #         'answer': '',
-        #         'answer_id': 0,        
+        #         'answer_id': 0,
         #     },
         # ]
 
@@ -106,27 +137,27 @@ def handle_questions():
     except Exception as e:
         err_msg = str(e)
         logging.error(f"<handle_questions> Error in handle_questions: {err_msg}")
-        return jsonify({'error': err_msg}), 500
+        return jsonify({"error": err_msg}), 500
     finally:
         db.session.close()
 
 
-@app.route("/api/answers/accept", methods=['POST'])
+@app.route("/api/answers/accept", methods=["POST"])
 def accept_answer():
     """
-    accept the answer in the database. 
+    accept the answer in the database.
     marks any feedback related to be INACTIVE.
 
     accept is tranlated to number of upvotes.
     reject is tranlated to number of downvotes.
     """
     data = request.get_json()
-    answer_id = data.get('answer_id')
+    answer_id = data.get("answer_id")
 
     try:
         function.update_answer(answer_id, 1, 0)
         # Mark all feedback as inactive when the answer is accepted
-        Feedback.query.filter_by(answer_id=answer_id).update({'active': False})
+        Feedback.query.filter_by(answer_id=answer_id).update({"active": False})
         # Commit the changes to the database
         db.session.commit()
         return jsonify({"message": "Accept successfully"}), 200
@@ -140,7 +171,7 @@ def accept_answer():
         db.session.close()
 
 
-@app.route("/api/answers/unaccept", methods=['POST'])
+@app.route("/api/answers/unaccept", methods=["POST"])
 def unaccept_answer():
     """
     unaccept the answer in the database.
@@ -149,7 +180,7 @@ def unaccept_answer():
     reject is tranlated to number of downvotes.
     """
     data = request.get_json()
-    answer_id = data.get('answer_id')
+    answer_id = data.get("answer_id")
 
     try:
         function.update_answer(answer_id, -1, 0)
@@ -163,7 +194,8 @@ def unaccept_answer():
     finally:
         db.session.close()
 
-@app.route("/api/answers/reject", methods=['POST'])
+
+@app.route("/api/answers/reject", methods=["POST"])
 def reject_answer():
     """
     reject the answer in the database.
@@ -173,13 +205,13 @@ def reject_answer():
     reject is tranlated to number of downvotes.
     """
     data = request.get_json()
-    answer_id = data.get('answer_id')
+    answer_id = data.get("answer_id")
 
     try:
         function.update_answer(answer_id, 0, 1)
 
         # Mark all feedback as active when the answer is rejected
-        Feedback.query.filter_by(answer_id=answer_id).update({'active': True})
+        Feedback.query.filter_by(answer_id=answer_id).update({"active": True})
         # Commit the changes to the database
         db.session.commit()
 
@@ -193,7 +225,8 @@ def reject_answer():
     finally:
         db.session.close()
 
-@app.route("/api/answers/unreject", methods=['POST'])
+
+@app.route("/api/answers/unreject", methods=["POST"])
 def unreject_answer():
     """
     unreject the answer in the database.
@@ -202,7 +235,7 @@ def unreject_answer():
     reject is tranlated to number of downvotes.
     """
     data = request.get_json()
-    answer_id = data.get('answer_id')
+    answer_id = data.get("answer_id")
 
     try:
         function.update_answer(answer_id, 0, -1)
@@ -217,15 +250,15 @@ def unreject_answer():
         db.session.close()
 
 
-@app.route("/api/answers/feedback", methods=['POST'])
+@app.route("/api/answers/feedback", methods=["POST"])
 def upsert_feedback():
     """
     add feedback for the answer in the database or update it if exists
     """
     data = request.get_json()
-    answer_id = data.get('answer_id')
-    predefined_feedbacks = data.get('predefined_feedbacks')
-    text_feedback = data.get('text_feedback')
+    answer_id = data.get("answer_id")
+    predefined_feedbacks = data.get("predefined_feedbacks")
+    text_feedback = data.get("text_feedback")
     try:
         feedback = Feedback.query.filter_by(answer_id=answer_id).first()
 
@@ -245,15 +278,18 @@ def upsert_feedback():
 
         db.session.commit()
 
-        return jsonify({'message': 'Feedback upserted successfully'}), 200
-    
+        return jsonify({"message": "Feedback upserted successfully"}), 200
+
     except SQLAlchemyError as e:
         db.session.rollback()
-        logging.error(f"<handle_questions> Error in upseting feedback for {answer_id}: {e}")
-        return jsonify({'error': 'Database operation failed'}), 500
+        logging.error(
+            f"<handle_questions> Error in upseting feedback for {answer_id}: {e}"
+        )
+        return jsonify({"error": "Database operation failed"}), 500
 
     finally:
         db.session.close()
+
 
 # @app.route("/api/questions/search", methods=['GET'])
 # def search_questions():
@@ -308,5 +344,5 @@ def upsert_feedback():
 #     })
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
