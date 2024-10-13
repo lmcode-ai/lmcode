@@ -161,7 +161,6 @@ const HomePage = () => {
           {task !== "Input/Output Examples" ? (
             <CodeEditor
               language={task === "Code Translation" ? sourceLanguage : language}
-              code={code}
               setCode={setCode}
             />
           ) : (

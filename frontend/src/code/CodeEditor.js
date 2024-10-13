@@ -9,12 +9,11 @@ import { defaultLanguage, languageExtensions } from "./constants";
 const Height = '300px';
 const FontSize = '16px';
 
-const CodeEditor = ({ language, code, setCode }) => {
+const CodeEditor = ({ language, setCode }) => {
   const editorRef = useRef();
 
   useEffect(() => {
     const startState = EditorState.create({
-      doc: code,
       extensions: [
         languageExtensions[language] ? languageExtensions[language]() : defaultLanguage(),
         quietlight,

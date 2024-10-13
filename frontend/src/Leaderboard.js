@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-
-const leaderboardData = [
-    { id: 1, name: 'GPT-4o', votes: "-", rating: "-" },
-    { id: 2, name: 'Claude-3.5', votes: "-", rating: "-" },
-    { id: 3, name: 'Gemini-1.5-pro', votes: "-", rating: "-" },
-    { id: 4, name: 'Llama-70b', votes: "-", rating: "-" },
-    { id: 5, name: 'Qwen 70b', votes: "-", rating: "-" },
-];
+import React, { useState, useMemo } from 'react';
 
 const Leaderboard = () => {
-    const [data, setData] = useState(leaderboardData);
+    const data = useMemo(() => ([
+        { id: 1, name: 'GPT-4o', votes: "-", rating: "-" },
+        { id: 2, name: 'Claude-3.5', votes: "-", rating: "-" },
+        { id: 3, name: 'Gemini-1.5-pro', votes: "-", rating: "-" },
+        { id: 4, name: 'Llama-70b', votes: "-", rating: "-" },
+        { id: 5, name: 'Qwen 70b', votes: "-", rating: "-" },
+    ]), []);
     const [sortConfig, setSortConfig] = useState(null);
 
     const sortedData = [...data];
