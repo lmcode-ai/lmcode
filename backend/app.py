@@ -13,7 +13,7 @@ def create_app():
     CORS(
         app,
         supports_credentials=True,
-        origins=[r"^https?://(localhost|10\.1\.\d+\.\d+):\d+$"],
+        origins=[r"^https?://(localhost|10\.1\.\d+\.\d+|35\.199\.152\.39)/?(:\d+)?$"],
     )
 
     # Configuration for SQLite database
