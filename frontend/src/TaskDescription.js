@@ -111,7 +111,12 @@ const TaskDescription = ({ task }) => {
   const copyToClipboard = (text) => {
     if (navigator.clipboard && window.isSecureContext) {
       // If we are in a secure context, use the Clipboard API
-      navigator.clipboard.writeText(text);
+      try {
+        navigator.clipboard.writeText(text);
+        alert('Example input copied to clipboard!');
+      } catch (err) {
+        alert('Unable to copy to clipboard', err);
+      }
     } else {
       const textArea = document.createElement("textarea");
       textArea.value = text;
@@ -122,13 +127,12 @@ const TaskDescription = ({ task }) => {
       textArea.select();
       try {
         document.execCommand('copy');
+        alert('Example input copied to clipboard!');
       } catch (err) {
-        console.error('Unable to copy to clipboard', err);
+        alert('Unable to copy to clipboard', err);
       }
       document.body.removeChild(textArea);
     }
-
-    alert('Example input copied to clipboard!');
   };
 
   return (
