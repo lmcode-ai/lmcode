@@ -92,7 +92,6 @@ const ResultPage = () => {
 
   const handleAccept = (index) => {
     setAnswers((prevAnswers) => {
-      console.log("PREV ANSWERS", prevAnswers);
       return prevAnswers.map((answer, i) => {
         if (i === index) {
           if (!answer.accepted) {
