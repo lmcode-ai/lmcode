@@ -120,8 +120,9 @@ const TaskDescription = ({ task }) => {
     } else {
       const textArea = document.createElement("textarea");
       textArea.value = text;
-      // This text area should be hidden
-      textArea.hidden = true;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
