@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLanguageOptions, addLanguage } from './redux/languagesSlice';
+import { resolveUrl } from './utils/api';
 
 
 const LanguageSelection = ({ label, language, setLanguage }) => {
@@ -47,7 +48,7 @@ const LanguageSelection = ({ label, language, setLanguage }) => {
     if (customLanguage.trim()) {
       try {
         const trimmedLanguage = customLanguage.trim();
-        const response = await fetch('/api/add_language', {
+        const response = await fetch(resolveUrl('/api/add_language'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
