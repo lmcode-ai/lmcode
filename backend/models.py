@@ -59,3 +59,5 @@ class LLMError(db.Model):
     model_id = db.Column(db.String, nullable=False)
     prompt = db.Column(db.String, nullable=False)
     error = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
