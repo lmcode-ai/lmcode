@@ -72,7 +72,7 @@ const ResultPage = () => {
         const data = await response.json();
         // Extract the answers from the response and update the state
         const fetchedAnswers = data.map(answer => ({
-          id: answer.id,
+          id: answer.answer_id,
           model: answer.model,
           model_name: answer.model_name,
           content: answer.answer,
