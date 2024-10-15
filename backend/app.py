@@ -10,10 +10,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app)
+    CORS(
+        app,
+        supports_credentials=True,
+        origins=[r"^https?://(localhost|10\.1\.\d+\.\d+|35\.199\.152\.39)/?(:\d+)?$"],
+    )
 
     # Configuration for SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI 
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
@@ -57,7 +61,7 @@ def add_language():
         logging.info(f"<add_language> database commit successful for language: {language_name}")
 
         return jsonify({'message': 'Language added/updated successfully'}), 200
-    
+
     except Exception as e:
         db.session.rollback()
         logging.error(f"<add_language> Error in add language: {err_msg}")
@@ -88,7 +92,7 @@ def handle_questions():
         task = data.get('task')
         question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
         response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
-        
+
         logging.info(f"<handle_questions> llm response: {response}")
 
         # RESPONSE FORMAT
@@ -98,7 +102,7 @@ def handle_questions():
         #         'model_name': '',
         #         'model_id': 0,
         #         'answer': '',
-        #         'answer_id': 0,        
+        #         'answer_id': 0,
         #     },
         # ]
 
@@ -114,7 +118,7 @@ def handle_questions():
 @app.route("/api/answers/accept", methods=['POST'])
 def accept_answer():
     """
-    accept the answer in the database. 
+    accept the answer in the database.
     marks any feedback related to be INACTIVE.
 
     accept is tranlated to number of upvotes.
@@ -246,7 +250,7 @@ def upsert_feedback():
         db.session.commit()
 
         return jsonify({'message': 'Feedback upserted successfully'}), 200
-    
+
     except SQLAlchemyError as e:
         db.session.rollback()
         logging.error(f"<handle_questions> Error in upseting feedback for {answer_id}: {e}")
@@ -254,6 +258,10 @@ def upsert_feedback():
 
     finally:
         db.session.close()
+
+@app.route("/health", methods=['GET'])
+def health():
+    return jsonify({"status": "ok"}), 200
 
 # @app.route("/api/questions/search", methods=['GET'])
 # def search_questions():
@@ -309,4 +317,4 @@ def upsert_feedback():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5050)

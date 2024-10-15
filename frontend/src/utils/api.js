@@ -1,0 +1,1 @@
+export const resolveUrl = (url) => /^https?:/.test(url) ? url : `${process.env.REACT_APP_BACKEND_ORIGIN}${url}`;

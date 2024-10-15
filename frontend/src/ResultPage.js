@@ -6,6 +6,7 @@ import { quietlight } from '@uiw/codemirror-theme-quietlight';
 import { Container, Box, Typography, Button, Card, CardContent } from '@mui/material';
 import AnswerCard from './AnswerCard';
 import { languageExtensions, defaultLanguage } from './code/constants';
+import { resolveUrl } from './utils/api';
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -17,18 +18,18 @@ const ResultPage = () => {
   }
 
   const [answers, setAnswers] = useState([{ content: 'Loading...' }]);
-  // each answer state is of structure: 
+  // each answer state is of structure:
   /**     id: the answer id
           model: masked model name
           model_name: actual model name
           content: answer
           accepted: accepted flag
           rejected: rejected flag
-   * 
+   *
    */
 
   const makeApiRequestAndCheckStatus = (endpoint, method, body) => {
-    return fetch(endpoint, {
+    return fetch(resolveUrl(endpoint), {
       method: method,
       headers: {
         'Content-Type': 'application/json',
@@ -45,11 +46,11 @@ const ResultPage = () => {
         console.error(`Error during ${method} request to ${endpoint}:`, error);
       });
   };
-  
+
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        const response = await fetch('/api/questions/handle', {
+        const response = await fetch(resolveUrl('/api/questions/handle'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,12 +97,12 @@ const ResultPage = () => {
           if (!answer.accepted) {
             // If the answer was not accepted before, accept it
             makeApiRequestAndCheckStatus('/api/answers/accept', 'POST', { answer_id: answer.id });
-            
+
             if (answer.rejected) {
               // Ensure rejection is undone if the answer is accepted
               makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
             }
-            
+
           } else {
             // If already accepted and toggled off, undo the accept
             makeApiRequestAndCheckStatus('/api/answers/unaccept', 'POST', { answer_id: answer.id });
@@ -144,7 +145,7 @@ const ResultPage = () => {
 
   const handleReport = (index, predefinedFeedbacks, textFeedback) => {
 
-    fetch(`/api/answers/feedback`, {
+    fetch(resolveUrl(`/api/answers/feedback`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
