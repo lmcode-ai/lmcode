@@ -6,6 +6,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import copy icon
 import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
 import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
+import { copyToClipboard } from './utils/text';
 
 const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAccept, onReject, onReport }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
@@ -31,18 +32,6 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
 
   const handleReportDialogClose = () => {
     setReportDialogOpen(false);
-  };
-
-  // Copy to clipboard function
-  const handleCopy = (code) => {
-    navigator.clipboard.writeText(code).then(
-      () => {
-        console.log('Copied to clipboard successfully');
-      },
-      (err) => {
-        console.error('Failed to copy: ', err);
-      }
-    );
   };
 
   // Split the answer into model and content
@@ -71,7 +60,7 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
                   />
                   {/* Copy button in top-right corner of the code block */}
                   <IconButton
-                    onClick={() => handleCopy(codeContent)} // Copy the code content
+                    onClick={() => copyToClipboard(codeContent)} // Copy the code content
                     sx={{
                       position: 'absolute',
                       top: '8px',
