@@ -34,6 +34,6 @@ llm:
   retries: 3
 
 google-ai-platform:
-  active: false # controls to use environment api key for Gemini or not. False means use local Gemini Key; True means use Google AI Platform.
+  active: true # controls to use environment api key for Gemini or not. False means use local Gemini Key; True means use Google AI Platform.
   project: "lmcode"
   location: "us-central1"
