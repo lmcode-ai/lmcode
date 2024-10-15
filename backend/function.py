@@ -108,7 +108,7 @@ def get_answers_from_models(content, language, source_language, target_language,
     random.shuffle(responses)
     for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
         response['model'] = f"model {chr(idx)}" # name displayed at frontend
-        answer_id = insert_answer(answer, model_id, question_id, order=idx-65)
+        answer_id = insert_answer(response['answer'], response['model_id'], question_id, order=idx-65)
         response['answer_id'] = answer_id
         
     return responses
