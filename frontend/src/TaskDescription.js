@@ -8,6 +8,7 @@ import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { copyToClipboard } from './utils/text';
 
 SyntaxHighlighter.registerLanguage('python', python);
 SyntaxHighlighter.registerLanguage('java', java);
@@ -83,16 +84,16 @@ Output: [0,1]`,
       output: `def two_sum(nums, target):
     # Create a dictionary to store the index of the elements
     num_map = {}
-    
+
     # Iterate through the list
     for i, num in enumerate(nums):
         # Calculate the complement of the current number
         complement = target - num
-        
+
         # If the complement is in the dictionary, return its index and the current index
         if complement in num_map:
             return [num_map[complement], i]
-        
+
         # Otherwise, store the current number with its index in the dictionary
         num_map[num] = i
     return num_map`,
@@ -106,11 +107,6 @@ const TaskDescription = ({ task }) => {
 
   const handleToggleExample = () => {
     setShowExample(!showExample);
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    alert('Example input copied to clipboard!');
   };
 
   return (

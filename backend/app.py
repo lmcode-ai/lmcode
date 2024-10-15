@@ -13,7 +13,7 @@ def create_app():
     CORS(
         app,
         supports_credentials=True,
-        origins=[r"^https?://(localhost|10\.1\.\d+\.\d+|35\.199\.152\.39)/?(:\d+)?$"],
+        origins=[r"^https?://(localhost|10\.1\.\d+\.\d+|35\.199\.152\.39|lmcode\.ai)/?(:\d+)?$"],
     )
 
     # Configuration for SQLite database
@@ -38,7 +38,7 @@ app = create_app()
 @app.route('/api/add_language', methods=['POST'])
 def add_language():
     data = request.get_json()
-    language_name = data.get('language')    
+    language_name = data.get('language')
     logging.info(f"<add_language> request: {request.get_json()}")
 
     if not language_name:
@@ -86,16 +86,16 @@ def handle_questions():
         data = request.get_json()
         question_title = data.get('title')
         if question_title is None:
-            return jsonify({"error": "question_title is missing"}), 400 
-        
+            return jsonify({"error": "question_title is missing"}), 400
+
         question_content = data.get('content')
         if question_content is None:
-            return jsonify({"error": "question_content is missing"}), 400 
-        
+            return jsonify({"error": "question_content is missing"}), 400
+
         task = data.get('task')
         if task is None:
-            return jsonify({"error": "task is missing"}), 400 
-        
+            return jsonify({"error": "task is missing"}), 400
+
         language = data.get('language')
         source_language = data.get('sourceLanguage')
         target_language = data.get('targetLanguage')
@@ -152,12 +152,12 @@ def accept_answer():
     answer_id = data.get('answer_id')
 
     if answer_id is None:
-        return jsonify({"error": "answer_id is missing"}), 400 
+        return jsonify({"error": "answer_id is missing"}), 400
     try:
         answer_id = int(answer_id)
     except ValueError:
         return jsonify({"error": "answer_id must be an integer"}), 400
-    
+
     try:
         function.update_answer(answer_id, 1, 0)
         # Mark all feedback as inactive when the answer is accepted
@@ -187,12 +187,12 @@ def unaccept_answer():
     answer_id = data.get('answer_id')
 
     if answer_id is None:
-        return jsonify({"error": "answer_id is missing"}), 400 
+        return jsonify({"error": "answer_id is missing"}), 400
     try:
         answer_id = int(answer_id)
     except ValueError:
         return jsonify({"error": "answer_id must be an integer"}), 400
-    
+
     try:
         function.update_answer(answer_id, -1, 0)
         return jsonify({"message": "Unaccept successfully"}), 200
@@ -218,12 +218,12 @@ def reject_answer():
     answer_id = data.get('answer_id')
 
     if answer_id is None:
-        return jsonify({"error": "answer_id is missing"}), 400 
+        return jsonify({"error": "answer_id is missing"}), 400
     try:
         answer_id = int(answer_id)
     except ValueError:
         return jsonify({"error": "answer_id must be an integer"}), 400
-    
+
     try:
         function.update_answer(answer_id, 0, 1)
 
@@ -254,12 +254,12 @@ def unreject_answer():
     answer_id = data.get('answer_id')
 
     if answer_id is None:
-        return jsonify({"error": "answer_id is missing"}), 400 
+        return jsonify({"error": "answer_id is missing"}), 400
     try:
         answer_id = int(answer_id)
     except ValueError:
         return jsonify({"error": "answer_id must be an integer"}), 400
-    
+
     try:
         function.update_answer(answer_id, 0, -1)
         return jsonify({"message": "Unreject successfully"}), 200
@@ -282,12 +282,12 @@ def upsert_feedback():
     answer_id = data.get('answer_id')
 
     if answer_id is None:
-        return jsonify({"error": "answer_id is missing"}), 400 
+        return jsonify({"error": "answer_id is missing"}), 400
     try:
         answer_id = int(answer_id)
     except ValueError:
         return jsonify({"error": "answer_id must be an integer"}), 400
-    
+
     predefined_feedbacks = data.get('predefined_feedbacks', [])
 
     text_feedback = data.get('text_feedback')
