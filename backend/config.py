@@ -13,7 +13,12 @@ from logging.handlers import RotatingFileHandler
 
 
 class Config:
-    def __init__(self, config_file="app_config.yaml"):
+    def __init__(self):
+        if os.getenv('FLASK_ENV') == 'production':
+            config_file = "app_config.production.yaml"
+        else:
+            config_file = "app_config.development.yaml"
+
         # Load the YAML file
         with open(config_file, "r") as file:
             config_data = yaml.safe_load(file)
