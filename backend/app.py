@@ -35,6 +35,11 @@ def create_app():
 
 app = create_app()
 
+@app.route('/api/health', methods=['GET'])
+def add_language():
+    return jsonify({'message': 'request received'}), 200
+
+
 @app.route('/api/add_language', methods=['POST'])
 def add_language():
     data = request.get_json()
