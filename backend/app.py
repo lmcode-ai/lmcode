@@ -36,7 +36,7 @@ def create_app():
 app = create_app()
 
 @app.route('/api/health', methods=['GET'])
-def add_language():
+def heath_check():
     return jsonify({'message': 'request received'}), 200
 
 
