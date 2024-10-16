@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
-import { defaultKeymap } from '@codemirror/commands';
+import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { keymap } from '@codemirror/view';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
 import { defaultLanguage, languageExtensions } from "./constants";
@@ -17,7 +17,7 @@ const CodeEditor = ({ language, setCode }) => {
       extensions: [
         languageExtensions[language] ? languageExtensions[language]() : defaultLanguage(),
         quietlight,
-        keymap.of(defaultKeymap), // Enable default key bindings, especially for enabling Enter key
+        keymap.of([...defaultKeymap, indentWithTab]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             setCode(update.state.doc.toString());
