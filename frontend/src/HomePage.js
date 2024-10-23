@@ -49,7 +49,7 @@ const HomePage = () => {
 
     // Convert examples to a string format
     const examplesString = examples.map(example =>
-      `Input: ${example.input}\nOutput: ${example.output}`
+      `Your input: ${example.input}\nYour output: ${example.output}`
     ).join('\n\n'); // Join with double newlines for separation
 
     const taskDetails = {
