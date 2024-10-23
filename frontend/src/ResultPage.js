@@ -53,30 +53,26 @@ const ResultPage = () => {
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        // const response = await fetch(resolveUrl('/api/questions/handle'), {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     title,
-        //     content,
-        //     language,
-        //     sourceLanguage,
-        //     targetLanguage,
-        //     task,
-        //   }),
-        // });
+        const response = await fetch(resolveUrl('/api/questions/handle'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            language,
+            sourceLanguage,
+            targetLanguage,
+            task,
+          }),
+        });
 
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch answers');
-        // }
+        if (!response.ok) {
+          throw new Error('Failed to fetch answers');
+        }
 
-        // const data = await response.json();
-        // sleep for 2 seconds to simulate the model response
-        await new Promise(r => setTimeout(r, 10000));
-        throw new Error('Failed to fetch answers');
-        const data = [{ id: 1, model: 't5-base', model_name: 't5-base', answer: 'Hello, World!', accepted: false, rejected: false }];
+        const data = await response.json();
         // Extract the answers from the response and update the state
         const fetchedAnswers = data.map(answer => ({
           id: answer.answer_id,
@@ -213,7 +209,7 @@ const ResultPage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
-    }, 10000); // Change message every 10 seconds
+    }, 5000); // Change message every 10 seconds
 
     return () => clearInterval(interval); // Cleanup the interval on unmount
   }, []);
