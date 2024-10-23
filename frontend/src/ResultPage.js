@@ -209,7 +209,7 @@ const ResultPage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
-    }, 5000); // Change message every 10 seconds
+    }, 10000); // Change message every 10 seconds
 
     return () => clearInterval(interval); // Cleanup the interval on unmount
   }, []);
