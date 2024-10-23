@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
-import { Container, Box, Typography, Button, Card, CardContent, Stack } from '@mui/material';
+import { Container, Box, Typography, Button, Card, CardContent, Stack, CircularProgress } from '@mui/material';
 import AnswerCard from './AnswerCard';
 import { languageExtensions, defaultLanguage } from './code/constants';
 import { resolveUrl } from './utils/api';
@@ -18,7 +18,9 @@ const ResultPage = () => {
     throw new Error('Invalid code: ' + content);
   }
 
-  const [answers, setAnswers] = useState([{ content: 'Loading...' }]);
+  const [answers, setAnswers] = useState([]);
+  const [hasError, setHasError] = useState(false);
+
   // each answer state is of structure:
   /**     id: the answer id
           model: masked model name
@@ -51,26 +53,30 @@ const ResultPage = () => {
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        const response = await fetch(resolveUrl('/api/questions/handle'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title,
-            content,
-            language,
-            sourceLanguage,
-            targetLanguage,
-            task,
-          }),
-        });
+        // const response = await fetch(resolveUrl('/api/questions/handle'), {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({
+        //     title,
+        //     content,
+        //     language,
+        //     sourceLanguage,
+        //     targetLanguage,
+        //     task,
+        //   }),
+        // });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch answers');
-        }
+        // if (!response.ok) {
+        //   throw new Error('Failed to fetch answers');
+        // }
 
-        const data = await response.json();
+        // const data = await response.json();
+        // sleep for 2 seconds to simulate the model response
+        await new Promise(r => setTimeout(r, 10000));
+        throw new Error('Failed to fetch answers');
+        const data = [{ id: 1, model: 't5-base', model_name: 't5-base', answer: 'Hello, World!', accepted: false, rejected: false }];
         // Extract the answers from the response and update the state
         const fetchedAnswers = data.map(answer => ({
           id: answer.answer_id,
@@ -83,7 +89,7 @@ const ResultPage = () => {
         setAnswers(fetchedAnswers);
       } catch (error) {
         console.error('Error fetching answers:', error);
-        setAnswers([{ content: 'Error loading answers' }]);
+        setHasError(true);
       }
     };
 
@@ -195,6 +201,23 @@ const ResultPage = () => {
     };
   }, [task, language, sourceLanguage, content]);
 
+  const loadingMessages = [
+    "Loading... Trying to avoid Stack Overflow 😛",
+    "Fetching answers... One keystroke at a time! 🖥️",
+    "Almost there... Just one more semicolon! ⏳"
+  ]
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  const failureMessage = "Oops... 🥹 Looks like even the AI is stumped!";
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
+    }, 10000); // Change message every 10 seconds
+
+    return () => clearInterval(interval); // Cleanup the interval on unmount
+  }, []);
+
   return (
     <Container>
       <Box sx={{ mt: 4 }}>
@@ -228,7 +251,16 @@ const ResultPage = () => {
               <div ref={editorRef} style={{ marginBottom: '16px', maxHeight: 'none' }} />
             </CardContent>
           </Card>
-          {answers.map((answer, index) => (
+          {!hasError && answers.length === 0 &&
+            <Box sx={{ display: "flex", alignItems: 'center' }}>
+              <Typography variant="h6" sx={{ mr: "1ch" }}>
+                {loadingMessages[currentMessageIndex]}
+              </Typography>
+              <CircularProgress />
+            </Box>
+          }
+          {hasError && <Typography variant="h6">{failureMessage}</Typography>}
+          {!hasError && answers.map((answer, index) => (
             <AnswerCard
               key={index}
               index={index}
