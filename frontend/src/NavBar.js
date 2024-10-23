@@ -37,6 +37,15 @@ const Navbar = () => {
             }
           }}
         >
+          {/* Home button first */}
+          <Button
+            key="home"
+            sx={{ color: 'white', display: 'block' }}
+            component={Link}
+            to="/"
+          >
+            Home
+          </Button>
           {/* Leaderboard Link moved before About Us */}
           <Button
             key="leaderboard"
