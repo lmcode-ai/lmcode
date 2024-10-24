@@ -60,6 +60,59 @@ def insert_answer(content, model, question_id, order=-1) -> int:
 
     return answer.id
 
+async def get_answer_from_model(
+    *,
+    model_id: str,
+    content: str,
+    language: str,
+    source_language: str,
+    target_language: str,
+    task: str,
+    question_id: int,
+) -> dict[str, str]:
+    """
+    Get answer from a specific model
+    :param model_id: the id of the model
+    :param content: the question content
+    :param language: the language of the question (if any)
+    :param source_language: the source language of the question (if any)
+    :param target_language: the target language of the question (if any)
+    :param task: the chosen task category of the question
+    :param question_id: the id of the question
+    :return:
+    """
+    task_template = config.TASK_PROMPTS[task]
+
+    # Gather input data to chain
+    input_data = {}
+    if task == "Code Translation":
+        input_data["source_language"] = source_language
+        input_data["target_language"] = target_language
+        input_data["content"] = content
+    else:
+        input_data["language"] = language
+        input_data["content"] = content
+
+    # llm chains is mapping from model id to client
+    llm_client = config.LLM_CHAINS[model_id]
+    try:
+        content = await async_llm_call(task_template, llm_client)
+    except Exception as e:
+        llm_error = LLMError(
+            question_id=question_id,
+            model_id=model_id,
+            prompt=task_template.format(**input_data),
+            error=str(e),
+        )
+        db.session.add(llm_error)
+        db.session.commit()
+        raise
+
+    response: dict[str, str] = {}
+    response['model_name'] = config.LLM_ID_NAME[model_id]
+    response['model_id'] = model_id
+    response['content'] = content
+    return response
 
 async def get_answers_from_models(content, language, source_language, target_language, task, question_id) -> list:
     """
@@ -74,34 +127,13 @@ async def get_answers_from_models(content, language, source_language, target_lan
     """
 
     responses = []
-    task_template = config.TASK_PROMPTS[task]
 
-    # Gather input data to chain
-    input_data = {}
-    if task == "Code Translation":
-        input_data["source_language"] = source_language
-        input_data["target_language"] = target_language
-        input_data["content"] = content
-    else:
-        input_data["language"] = language
-        input_data["content"] = content
 
     # Run all chain in parallel
     # parallel_runnable = task_template | config.LLM_CHAINS
     # TODO(jie): change this to async
     # llm_responses = parallel_runnable.invoke(input_data)
-    # llm chains is mapping from model id to client
-    tasks = [async_llm_call(task_template, model_id, llm_client) for model_id, llm_client in config.LLM_CHAINS.items()]
 
-    # Run tasks concurrently
-    for task in asyncio.as_completed(tasks):
-        try:
-            model_id, result = await task
-            print(f"Model '{model_id}' finished responding first.")
-            print(f"Received response from {model_id}: {result}")
-            print("-" * 50)
-        except Exception as e:
-            print(f"An error occurred: {e}")
 
     # for model_id, _ in config.LLM_CHAINS.items():
     #     if model_id not in llm_responses:
@@ -149,7 +181,7 @@ def update_answer(answer_id: int, upvote_change, downvote_change) -> None:
 
     db.session.commit()
 
-async def async_llm_call(prompt_text, model_id, llm_client):
+async def async_llm_call(prompt_text, llm_client):
     # Create the prompt
     system_message = SystemMessagePromptTemplate.from_template(
         "You are a helpful assistant."
@@ -164,4 +196,4 @@ async def async_llm_call(prompt_text, model_id, llm_client):
     response = await llm_client.agenerate([messages])
 
     # Extract and return the assistant's reply along with the model name
-    return model_id, response.generations[0][0].text.strip()
+    return response.generations[0][0].text.strip()

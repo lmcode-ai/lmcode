@@ -76,72 +76,36 @@ def add_language():
         db.session.close()
 
 
-@app.route('/api/questions/handle', methods=['POST'])
-async def handle_questions():
-    """
-    add the question in the database,
-    invoke apis to get the answers,
-    add these answers in the database,
-    return the related information of each answer {model, answer, answer_id}
-    invoke this when the page is directed to the result page.
-    """
-    logging.info(f"<handle_questions> request: {request.get_json()}")
-    try:
-        ip_address = request.remote_addr
-        data = request.get_json()
-        question_title = data.get('title')
-        if question_title is None:
-            return jsonify({"error": "question_title is missing"}), 400
+# @app.route('/api/questions/handle', methods=['POST'])
+# async def handle_questions():
+#     """
+#     add the question in the database,
+#     invoke apis to get the answers,
+#     add these answers in the database,
+#     return the related information of each answer {model, answer, answer_id}
+#     invoke this when the page is directed to the result page.
+#     """
+#     logging.info(f"<handle_questions> request: {request.get_json()}")
 
-        question_content = data.get('content')
-        if question_content is None:
-            return jsonify({"error": "question_content is missing"}), 400
 
-        task = data.get('task')
-        if task is None:
-            return jsonify({"error": "task is missing"}), 400
+#         # RESPONSE FORMAT
+#         # response = [
+#         #     {
+#         #         'model': '',
+#         #         'model_name': '',
+#         #         'model_id': 0,
+#         #         'answer': '',
+#         #         'answer_id': 0,
+#         #     },
+#         # ]
 
-        language = data.get('language')
-        source_language = data.get('sourceLanguage')
-        target_language = data.get('targetLanguage')
-
-        if task == "Code Translation":
-            if source_language is None or target_language is None:
-                return jsonify({"error": "both 'sourceLanguage' and 'targetLanguage' must be provided for translation."}), 400
-
-            # ignore language if passed in for tranlation
-            language = ""
-        else:
-            if language is None:
-                return jsonify({"error": "'language' must be set for non-translation."}), 400
-
-            # ignore source and target language if not for tranlation
-            source_language = ""
-            target_language = ""
-
-        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
-        response = await function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
-
-        logging.info(f"<handle_questions> llm response: {response}")
-
-        # RESPONSE FORMAT
-        # response = [
-        #     {
-        #         'model': '',
-        #         'model_name': '',
-        #         'model_id': 0,
-        #         'answer': '',
-        #         'answer_id': 0,
-        #     },
-        # ]
-
-        return jsonify(response), 200
-    except Exception as e:
-        err_msg = str(e)
-        logging.error(f"<handle_questions> Error in handle_questions: {err_msg}")
-        return jsonify({'error': err_msg}), 500
-    finally:
-        db.session.close()
+#         return jsonify(response), 200
+#     except Exception as e:
+#         err_msg = str(e)
+#         logging.error(f"<handle_questions> Error in handle_questions: {err_msg}")
+#         return jsonify({'error': err_msg}), 500
+#     finally:
+#         db.session.close()
 
 
 @app.route("/api/answers/accept", methods=['POST'])
@@ -325,6 +289,66 @@ def upsert_feedback():
 
     finally:
         db.session.close()
+
+@app.route("/api/answer", methods=["POST"])
+async def get_answer_from_model():
+    # TODO: add error handler to flask
+    try:
+        ip_address = request.remote_addr
+        data = request.get_json()
+        model_id = data.get("model_id")
+        if model_id is None:
+            return jsonify({"error": "model_id is missing"}), 400
+        question_title = data.get('title')
+        if question_title is None:
+            return jsonify({"error": "question_title is missing"}), 400
+
+        question_content = data.get('content')
+        if question_content is None:
+            return jsonify({"error": "question_content is missing"}), 400
+
+        task = data.get('task')
+        if task is None:
+            return jsonify({"error": "task is missing"}), 400
+
+        language = data.get('language')
+        source_language = data.get('sourceLanguage')
+        target_language = data.get('targetLanguage')
+
+        if task == "Code Translation":
+            if source_language is None or target_language is None:
+                return jsonify({"error": "both 'sourceLanguage' and 'targetLanguage' must be provided for translation."}), 400
+
+            # ignore language if passed in for tranlation
+            language = ""
+        else:
+            if language is None:
+                return jsonify({"error": "'language' must be set for non-translation."}), 400
+
+            # ignore source and target language if not for tranlation
+            source_language = ""
+            target_language = ""
+
+        question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
+        response = await function.get_answer_from_model(
+            model_id=model_id,
+            content=question_content,
+            language=language,
+            source_language=source_language,
+            target_language=target_language,
+            task=task,
+            question_id=question_id,
+        )
+
+        logging.info(f"<handle_questions> llm response: {response}")
+        return jsonify([response]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/model-ids", methods=["GET"])
+def get_model_ids():
+    return jsonify(config.LLM_CHAINS.keys()), 200
 
 @app.route("/health", methods=['GET'])
 def health():

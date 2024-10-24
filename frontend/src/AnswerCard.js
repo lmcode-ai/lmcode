@@ -8,7 +8,7 @@ import CodeBlock from './code/CodeBlock'; // Adjust the path as necessary
 import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
 import { copyToClipboard } from './utils/text';
 
-const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAccept, onReject, onReport }) => {
+const AnswerCard = ({ index, model_id, model_name, answer, accepted, rejected, onAccept, onReject, onReport }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleAccept = () => {
@@ -42,7 +42,7 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
     <Card elevation={3}>
       <CardContent>
         <Typography variant="h6" component="div">
-          {`Answer ${index + 1} (${model})`}
+          {`Answer ${index + 1} (${model_name})`}
         </Typography>
         <ReactMarkdown
           children={displayAnswer}

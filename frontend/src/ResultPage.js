@@ -7,7 +7,7 @@ import { Container, Box, Typography, Button, Card, CardContent, Stack, CircularP
 import AnswerCard from './AnswerCard';
 import { languageExtensions, defaultLanguage } from './code/constants';
 import { resolveUrl } from './utils/api';
-import { QUESTION_TITLE_TEXT } from './utils/constants';
+import { QUESTION_TITLE_TEXT, LOADING_MESSAGES } from './utils/constants';
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -53,12 +53,13 @@ const ResultPage = () => {
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        const response = await fetch(resolveUrl('/api/questions/handle'), {
+        const response = await fetch(resolveUrl('/api/answer'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            model_id: "gpt-4o",
             title,
             content,
             language,
@@ -76,9 +77,9 @@ const ResultPage = () => {
         // Extract the answers from the response and update the state
         const fetchedAnswers = data.map(answer => ({
           id: answer.answer_id,
-          model: answer.model,
+          model_id: answer.model_id,
           model_name: answer.model_name,
-          content: answer.answer,
+          content: answer.content,
           accepted: false,
           rejected: false,
         }));
@@ -197,18 +198,13 @@ const ResultPage = () => {
     };
   }, [task, language, sourceLanguage, content]);
 
-  const loadingMessages = [
-    "Loading... Trying to avoid Stack Overflow 😛",
-    "Fetching answers... One keystroke at a time! 🖥️",
-    "Almost there... Just one more semicolon! ⏳"
-  ]
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const failureMessage = "Oops... 🥹 Looks like even the AI is stumped!";
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
+      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % LOADING_MESSAGES.length);
     }, 10000); // Change message every 10 seconds
 
     return () => clearInterval(interval); // Cleanup the interval on unmount
@@ -250,7 +246,7 @@ const ResultPage = () => {
           {!hasError && answers.length === 0 &&
             <Box sx={{ display: "flex", alignItems: 'center' }}>
               <Typography variant="h6" sx={{ mr: "1ch" }}>
-                {loadingMessages[currentMessageIndex]}
+                {LOADING_MESSAGES[currentMessageIndex]}
               </Typography>
               <CircularProgress />
             </Box>
@@ -260,7 +256,7 @@ const ResultPage = () => {
             <AnswerCard
               key={index}
               index={index}
-              model={answer.model}
+              model_id={answer.model_id}
               model_name={answer.model_name}
               answer={answer.content}
               accepted={answer.accepted}
