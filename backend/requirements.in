@@ -2,6 +2,7 @@ anthropic
 Flask
 Flask-Cors
 Flask-SQLAlchemy
+flask[async]
 google-cloud-aiplatform[reasoningengine,langchain]
 langchain
 langchain_google_vertexai

@@ -77,7 +77,7 @@ def add_language():
 
 
 @app.route('/api/questions/handle', methods=['POST'])
-def handle_questions():
+async def handle_questions():
     """
     add the question in the database,
     invoke apis to get the answers,
@@ -104,23 +104,23 @@ def handle_questions():
         language = data.get('language')
         source_language = data.get('sourceLanguage')
         target_language = data.get('targetLanguage')
-        
+
         if task == "Code Translation":
             if source_language is None or target_language is None:
                 return jsonify({"error": "both 'sourceLanguage' and 'targetLanguage' must be provided for translation."}), 400
-            
+
             # ignore language if passed in for tranlation
             language = ""
         else:
             if language is None:
                 return jsonify({"error": "'language' must be set for non-translation."}), 400
-            
+
             # ignore source and target language if not for tranlation
             source_language = ""
             target_language = ""
-        
+
         question_id = function.insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
-        response = function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
+        response = await function.get_answers_from_models(question_content, language, source_language, target_language, task, question_id)
 
         logging.info(f"<handle_questions> llm response: {response}")
 

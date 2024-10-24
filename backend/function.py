@@ -1,10 +1,15 @@
+import asyncio
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Language, Question, Answer, LLMError
 from config import config
 from langchain_core.runnables import RunnableParallel
 import random
-
+from langchain.prompts import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
 
 def insert_question(title, content, language, source_language, target_language, task, ip_address) -> int:
     """
@@ -56,7 +61,7 @@ def insert_answer(content, model, question_id, order=-1) -> int:
     return answer.id
 
 
-def get_answers_from_models(content, language, source_language, target_language, task, question_id) -> list:
+async def get_answers_from_models(content, language, source_language, target_language, task, question_id) -> list:
     """
     Get answers from different models
     :param content: the question content
@@ -67,7 +72,7 @@ def get_answers_from_models(content, language, source_language, target_language,
     :param question_id: the id of the question
     :return:
     """
-    
+
     responses = []
     task_template = config.TASK_PROMPTS[task]
 
@@ -82,35 +87,48 @@ def get_answers_from_models(content, language, source_language, target_language,
         input_data["content"] = content
 
     # Run all chain in parallel
-    parallel_runnable = task_template | config.LLM_CHAINS
-    llm_responses = parallel_runnable.invoke(input_data)
+    # parallel_runnable = task_template | config.LLM_CHAINS
+    # TODO(jie): change this to async
+    # llm_responses = parallel_runnable.invoke(input_data)
+    # llm chains is mapping from model id to client
+    tasks = [async_llm_call(task_template, model_id, llm_client) for model_id, llm_client in config.LLM_CHAINS.items()]
 
-    for model_id, _ in config.LLM_CHAINS.items():
-        if model_id not in llm_responses:
-            # LLM Error has occured
-            llmError = LLMError(
-                question_id=question_id,
-                model_id=model_id,
-                prompt=task_template.format(**input_data),
-                error="Something went wrong during LLM call",
-            )
-            db.session.add(llmError)
-            db.session.commit()
-        else:
-            answer = llm_responses[model_id].content
+    # Run tasks concurrently
+    for task in asyncio.as_completed(tasks):
+        try:
+            model_id, result = await task
+            print(f"Model '{model_id}' finished responding first.")
+            print(f"Received response from {model_id}: {result}")
+            print("-" * 50)
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-            response = {}
-            response['model_name'] = config.LLM_ID_NAME[model_id]
-            response['model_id'] = model_id
-            response['answer'] = answer
-            responses.append(response)
+    # for model_id, _ in config.LLM_CHAINS.items():
+    #     if model_id not in llm_responses:
+    #         # LLM Error has occured
+    #         llmError = LLMError(
+    #             question_id=question_id,
+    #             model_id=model_id,
+    #             prompt=task_template.format(**input_data),
+    #             error="Something went wrong during LLM call",
+    #         )
+    #         db.session.add(llmError)
+    #         db.session.commit()
+    #     else:
+    #         answer = llm_responses[model_id].content
+
+    #         response = {}
+    #         response['model_name'] = config.LLM_ID_NAME[model_id]
+    #         response['model_id'] = model_id
+    #         response['answer'] = answer
+    #         responses.append(response)
 
     random.shuffle(responses)
     for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
         response['model'] = f"model {chr(idx)}" # name displayed at frontend
         answer_id = insert_answer(response['answer'], response['model_id'], question_id, order=idx-65)
         response['answer_id'] = answer_id
-        
+
     return responses
 
 
@@ -131,3 +149,19 @@ def update_answer(answer_id: int, upvote_change, downvote_change) -> None:
 
     db.session.commit()
 
+async def async_llm_call(prompt_text, model_id, llm_client):
+    # Create the prompt
+    system_message = SystemMessagePromptTemplate.from_template(
+        "You are a helpful assistant."
+    )
+    human_message = HumanMessagePromptTemplate.from_template("{input_text}")
+    chat_prompt = ChatPromptTemplate.from_messages([system_message, human_message])
+
+    # Format the prompt
+    messages = chat_prompt.format_prompt(input_text=prompt_text).to_messages()
+
+    # Invoke the LLM asynchronously
+    response = await llm_client.agenerate([messages])
+
+    # Extract and return the assistant's reply along with the model name
+    return model_id, response.generations[0][0].text.strip()
