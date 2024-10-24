@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { keymap } from '@codemirror/view';
+import { keymap, lineNumbers } from '@codemirror/view';
 import { quietlight } from '@uiw/codemirror-theme-quietlight';
 import { defaultLanguage, languageExtensions } from "./constants";
 
@@ -15,6 +15,7 @@ const CodeEditor = ({ language, setCode }) => {
   useEffect(() => {
     const startState = EditorState.create({
       extensions: [
+        lineNumbers(),
         languageExtensions[language] ? languageExtensions[language]() : defaultLanguage(),
         quietlight,
         keymap.of([...defaultKeymap, indentWithTab]),

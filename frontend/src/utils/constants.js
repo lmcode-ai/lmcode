@@ -1,0 +1,1 @@
+export const QUESTION_TITLE_TEXT = "Question Title";

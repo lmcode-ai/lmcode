@@ -118,10 +118,10 @@ const TaskDescription = ({ task }) => {
         {description}
       </Typography>
       <Typography variant="body2" sx={{ mt: 1 }}>
-        <strong>Input:</strong> {inputDescription}
+        <strong>Your input:</strong> {inputDescription}
       </Typography>
       <Typography variant="body2" sx={{ mt: 1 }}>
-        <strong>Output:</strong> {outputDescription}
+        <strong>Model output:</strong> {outputDescription}
       </Typography>
       <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
         <Button
@@ -141,7 +141,7 @@ const TaskDescription = ({ task }) => {
             </Typography>
           )}
           <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
-            Input:
+            Your input:
           </Typography>
           <Box sx={{ position: 'relative' }}>
             <SyntaxHighlighter language={example.language || 'text'} style={docco}>
@@ -156,7 +156,7 @@ const TaskDescription = ({ task }) => {
             </IconButton>
           </Box>
           <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1, mt: 2 }}>
-            Output:
+            Model output:
           </Typography>
           <SyntaxHighlighter language={example.language || 'text'} style={docco}>
             {example.output}

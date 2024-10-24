@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Box, IconButton, Divider, Tooltip } from '@mui/material';
+import { Card, CardContent, Typography, Box, IconButton, Tooltip } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -39,7 +39,7 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
   const displayAnswer = answer
 
   return (
-    <Card sx={{ mt: 2 }}>
+    <Card elevation={3}>
       <CardContent>
         <Typography variant="h6" component="div">
           {`Answer ${index + 1} (${model})`}
@@ -103,7 +103,7 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
             <IconButton
               color={accepted ? 'success' : 'default'}
               onClick={handleAccept}
-              sx={{ ml: 2 }}
+              sx={{ ml: 2, pb: 0 }}
             >
               <CheckCircleOutlineIcon />
             </IconButton>
@@ -126,13 +126,12 @@ const AnswerCard = ({ index, model, model_name, answer, accepted, rejected, onAc
             <IconButton
               color={rejected ? 'error' : 'default'}
               onClick={handleReject}
-              sx={{ ml: 2 }}
+              sx={{ ml: 2, pb: 0 }}
             >
               <HighlightOffIcon />
             </IconButton>
           </Tooltip>
         </Box>
-        <Divider sx={{ mt: 2 }} />
         <FeedbackDialog
           open={reportDialogOpen}
           onClose={handleReportDialogClose}

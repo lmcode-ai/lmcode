@@ -19,6 +19,7 @@ import LanguageSelection from './LanguageSelection';
 import CodeEditor from './code/CodeEditor';
 import TaskDescription from './TaskDescription';
 import InstructionsCard from './InstructionsCard';
+import { QUESTION_TITLE_TEXT } from './utils/constants';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const HomePage = () => {
 
     // Convert examples to a string format
     const examplesString = examples.map(example =>
-      `Input: ${example.input}\nOutput: ${example.output}`
+      `Your input: ${example.input}\nYour output: ${example.output}`
     ).join('\n\n'); // Join with double newlines for separation
 
     const taskDetails = {
@@ -125,7 +126,7 @@ const HomePage = () => {
           />
         </Box> */}
         <TextField
-          label="Question Title"
+          label={QUESTION_TITLE_TEXT}
           variant="outlined"
           fullWidth
           margin="normal"
