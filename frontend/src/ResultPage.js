@@ -253,6 +253,7 @@ const ResultPage = () => {
           }
           {hasError && <Typography variant="h6">{failureMessage}</Typography>}
           {!hasError && answers.map((answer, index) => (
+            // TODO: make everything camel case in the frontend.
             <AnswerCard
               key={index}
               index={index}

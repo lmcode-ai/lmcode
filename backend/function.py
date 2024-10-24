@@ -95,13 +95,14 @@ async def get_answer_from_model(
 
     # llm chains is mapping from model id to client
     llm_client = config.LLM_CHAINS[model_id]
+    prompt = task_template.format(**input_data)
     try:
-        content = await async_llm_call(task_template, llm_client)
+        content = await async_llm_call(prompt, llm_client)
     except Exception as e:
         llm_error = LLMError(
             question_id=question_id,
             model_id=model_id,
-            prompt=task_template.format(**input_data),
+            prompt=prompt,
             error=str(e),
         )
         db.session.add(llm_error)
