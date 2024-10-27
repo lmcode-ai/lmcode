@@ -115,62 +115,12 @@ async def get_answer_from_model(
     response['content'] = content
     return response
 
-async def get_answers_from_models(content, language, source_language, target_language, task, question_id) -> list:
-    """
-    Get answers from different models
-    :param content: the question content
-    :param language: the language of the question (if any)
-    :param source_language: the source language of the question (if any)
-    :param target_language: the target language of the question (if any)
-    :param task: the chosen task category of the question
-    :param question_id: the id of the question
-    :return:
-    """
-
-    responses = []
-
-
-    # Run all chain in parallel
-    # parallel_runnable = task_template | config.LLM_CHAINS
-    # TODO(jie): change this to async
-    # llm_responses = parallel_runnable.invoke(input_data)
-
-
-    # for model_id, _ in config.LLM_CHAINS.items():
-    #     if model_id not in llm_responses:
-    #         # LLM Error has occured
-    #         llmError = LLMError(
-    #             question_id=question_id,
-    #             model_id=model_id,
-    #             prompt=task_template.format(**input_data),
-    #             error="Something went wrong during LLM call",
-    #         )
-    #         db.session.add(llmError)
-    #         db.session.commit()
-    #     else:
-    #         answer = llm_responses[model_id].content
-
-    #         response = {}
-    #         response['model_name'] = config.LLM_ID_NAME[model_id]
-    #         response['model_id'] = model_id
-    #         response['answer'] = answer
-    #         responses.append(response)
-
-    random.shuffle(responses)
-    for idx, response in enumerate(responses, start=65): # Assuming less than 26 models so starting at A
-        response['model'] = f"model {chr(idx)}" # name displayed at frontend
-        answer_id = insert_answer(response['answer'], response['model_id'], question_id, order=idx-65)
-        response['answer_id'] = answer_id
-
-    return responses
-
-
-def update_answer(answer_id: int, upvote_change, downvote_change) -> None:
+def update_answer(answer_id: int, upvote_change: int, downvote_change: int) -> None:
     """
     Update the upvotes and downvotes of an answer
     :param answer_id: the id of the answer
-    :param upvote_i: the number of upvotes changed
-    :param downvote_i: the number of downvotes changed
+    :param upvote_change: the number of upvotes changed
+    :param downvote_change: the number of downvotes changed
     :return: None
     """
 
@@ -182,10 +132,10 @@ def update_answer(answer_id: int, upvote_change, downvote_change) -> None:
 
     db.session.commit()
 
-async def async_llm_call(prompt_text, llm_client):
+async def async_llm_call(prompt_text: int, llm_client) -> str:
     # Create the prompt
     system_message = SystemMessagePromptTemplate.from_template(
-        "You are a helpful assistant."
+        "You are a helpful programming assistant."
     )
     human_message = HumanMessagePromptTemplate.from_template("{input_text}")
     chat_prompt = ChatPromptTemplate.from_messages([system_message, human_message])
