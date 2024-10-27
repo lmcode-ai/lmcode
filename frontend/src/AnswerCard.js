@@ -86,6 +86,7 @@ const AnswerCard = ({
       } catch (error) {
         console.error('Error fetching answer for model:', modelId, error);
         setFailed(true);
+        setIsLoaded(true);
       }
     };
     fetchAnswer();
@@ -190,7 +191,7 @@ const AnswerCard = ({
         <Typography variant="h6" component="div">
           {`Answer ${index + 1} (Model ${indexToLetter(index)})`}
         </Typography>
-        {!isLoaded &&
+        {!isLoaded && !failed &&
         <Box sx={{ display: "flex", alignItems: 'center' }}>
           <Typography variant="body1" component="div" sx={{ mr: "1ch" }}>
             {message}
@@ -240,7 +241,7 @@ const AnswerCard = ({
           }}
         />
         }
-        {isLoaded &&
+        {isLoaded && !failed &&
         <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
           <Tooltip
             title="Accept this answer"
