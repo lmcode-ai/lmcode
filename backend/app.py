@@ -296,7 +296,7 @@ async def get_answer_from_model():
     try:
         ip_address = request.remote_addr
         data = request.get_json()
-        model_id = data.get("model_id")
+        model_id = data.get("modelId")
         if model_id is None:
             return jsonify({"error": "model_id is missing"}), 400
         question_title = data.get('title')
@@ -341,14 +341,18 @@ async def get_answer_from_model():
         )
 
         logging.info(f"<handle_questions> llm response: {response}")
-        return jsonify([response]), 200
+        return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/model-ids", methods=["GET"])
-def get_model_ids():
-    return jsonify(config.LLM_CHAINS.keys()), 200
+@app.route("/api/models/ids-to-names", methods=["GET"])
+def get_model_id_to_names():
+    id_to_name: dict[str, str] = {}
+    for _, models in config.LLM_DICT.items():
+        for model in models:
+            id_to_name[model.get("id")] = model.get("name")
+    return jsonify(id_to_name), 200
 
 @app.route("/health", methods=['GET'])
 def health():
