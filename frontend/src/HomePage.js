@@ -33,7 +33,6 @@ const HomePage = () => {
   const [code, setCode] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
-  const [questionId, setQuestionId] = useState(null);
   // const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const handleSubmit = async () => {
@@ -76,9 +75,9 @@ const HomePage = () => {
         throw new Error('Failed to insert question');
       }
       const questionId = await response.json();
-      setQuestionId(questionId);
+      return questionId;
     };
-    insertQuestion();
+    const questionId = await insertQuestion();
 
     // Navigate to the result page
 
