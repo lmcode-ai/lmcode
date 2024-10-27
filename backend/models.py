@@ -20,7 +20,7 @@ class Language(db.Model):
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=True)
+    title = db.Column(db.String, nullable=False)
     content = db.Column(db.String, nullable=False)
     language = db.Column(db.Integer, db.ForeignKey("language.id"), nullable=True)
     source_language = db.Column(db.Integer, db.ForeignKey("language.id"), nullable=True)

@@ -5,7 +5,7 @@ import os
 from config import config
 import logging
 from sqlalchemy.exc import SQLAlchemyError
-from function import update_answer, insert_question
+from function import update_answer, insert_question, get_answer_from_model
 
 
 def create_app():
@@ -259,10 +259,10 @@ def upsert_feedback():
         db.session.close()
 
 @app.route("/api/answer", methods=["POST"])
-async def get_answer_from_model():
+async def get_answer():
+    return jsonify("test"), 200
     # TODO: add error handler to flask
     try:
-        ip_address = request.remote_addr
         data = request.get_json()
         model_id = data.get("modelId")
         if model_id is None:
@@ -297,7 +297,10 @@ async def get_answer_from_model():
             source_language = ""
             target_language = ""
 
-        question_id = insert_question(question_title, question_content, language, source_language, target_language, task, ip_address)
+        question_id = data.get("questionId")
+        if question_id is None:
+            return jsonify({"error": "question_id is missing"}), 400
+
         response = await get_answer_from_model(
             model_id=model_id,
             content=question_content,
@@ -317,6 +320,37 @@ async def get_answer_from_model():
 @app.route("/api/models/ids", methods=["GET"])
 def get_model_ids():
     return jsonify(list(config.LLM_CHAINS.keys())), 200
+
+@app.route("/api/question", methods=["POST"])
+def add_question():
+    data = request.get_json()
+    title = data.get("title")
+    content = data.get("content")
+    language = data.get("language")
+    source_language = data.get("sourceLanguage")
+    target_language = data.get("targetLanguage")
+    task = data.get("task")
+    ip_address = request.remote_addr
+
+    if not title:
+        return jsonify({"error": "title is required"}), 400
+    if not content:
+        return jsonify({"error": "content is required"}), 400
+    if not task:
+        return jsonify({"error": "task is required"}), 400
+
+    question_id = insert_question(
+        title=title,
+        content=content,
+        language=language,
+        source_language=source_language,
+        target_language=target_language,
+        task=task,
+        ip_address=ip_address
+    )
+
+    return jsonify(question_id), 200
+
 
 @app.route("/health", methods=["GET"])
 def health():

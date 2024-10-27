@@ -14,6 +14,8 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const taskDetails = location.state.taskDetails;
+  const questionId = location.state.questionId;
+
   const {
     title,
     task,
@@ -43,15 +45,12 @@ const ResultPage = () => {
     fetchModelIds();
   }, []);
 
-  // each answer state is of structure:
-  /**     id: the answer id
-          model: masked model name
-          model_name: actual model name
-          content: answer
-          accepted: accepted flag
-          rejected: rejected flag
-   *
-   */
+  // Insert the question here
+  useEffect(() => {
+
+  // This is not ideal, but we have to disable it because for some reasons this page gets rendered twice. We have tried comparing with previous value, but nothing seems to work.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const editorRef = useRef();
 
@@ -116,6 +115,7 @@ const ResultPage = () => {
               index={index}
               modelId={modelId}
               taskDetails={taskDetails}
+              questionId={questionId}
             />
           ))}
         </Stack>

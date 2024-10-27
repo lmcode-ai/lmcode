@@ -9,7 +9,6 @@ import FeedbackDialog from './FeedbackDialog'; // Adjust the path as necessary
 import { copyToClipboard } from './utils/text';
 import { resolveUrl, makeApiRequestAndCheckStatus } from './utils/api';
 import { LOADING_MESSAGES } from './utils/constants';
-import remarkGfm from 'remark-gfm';
 
 // Function to convert index to uppercase letter
 const indexToLetter = (index) => String.fromCharCode(65 + index);
@@ -18,6 +17,7 @@ const AnswerCard = ({
   index,
   modelId,
   taskDetails,
+  questionId,
 }) => {
   const [answer, setAnswer] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -46,6 +46,10 @@ const AnswerCard = ({
 
     // Iterate over all the model IDs to try to get the answers
     const fetchAnswer = async () => {
+      // Before the question is inserted into the database, we don't try to fetch the answer.
+      if (!questionId) {
+        return;
+      }
       try {
         const response = await fetch(resolveUrl('/api/answer'), {
           method: 'POST',
@@ -53,6 +57,7 @@ const AnswerCard = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            questionId,
             modelId,
             title,
             content,
@@ -83,7 +88,7 @@ const AnswerCard = ({
       }
     };
     fetchAnswer();
-  }, [modelId, taskDetails]);
+  }, [modelId, taskDetails, questionId]);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleAccept = () => {
@@ -184,11 +189,7 @@ const AnswerCard = ({
         {isLoaded &&
         <ReactMarkdown
           children={message}
-          remarkPlugins={[remarkGfm]}
           components={{
-            spinner() {
-              return <CircularProgress />;
-            },
             code({ node, inline, className, children, ...props }) {
               const match = /language-(\w+)/.exec(className || '');
               const codeContent = String(children).replace(/\n$/, ''); // Extract code content

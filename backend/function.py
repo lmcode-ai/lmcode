@@ -1,17 +1,22 @@
-import asyncio
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from models import db, Language, Question, Answer, LLMError
+from typing import Optional
+from models import db, Question, Answer, LLMError
 from config import config
-from langchain_core.runnables import RunnableParallel
-import random
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
 
-def insert_question(title, content, language, source_language, target_language, task, ip_address) -> int:
+def insert_question(
+    *,
+    title: str,
+    content: str,
+    language: Optional[str],
+    source_language: Optional[str],
+    target_language: Optional[str],
+    task: str,
+    ip_address: str
+) -> int:
     """
     Add a question to the database
     :param title: the title of the question
@@ -110,9 +115,9 @@ async def get_answer_from_model(
         raise
 
     response: dict[str, str] = {}
-    response['model_name'] = config.LLM_ID_NAME[model_id]
-    response['model_id'] = model_id
-    response['content'] = content
+    response["model_name"] = config.LLM_ID_NAME[model_id]
+    response["model_id"] = model_id
+    response["content"] = content
     return response
 
 def update_answer(answer_id: int, upvote_change: int, downvote_change: int) -> None:
@@ -146,5 +151,5 @@ async def async_llm_call(prompt_text: int, llm_client) -> str:
     # Invoke the LLM asynchronously
     response = await llm_client.agenerate([messages])
 
-    # Extract and return the assistant's reply along with the model name
+    # Extract and return the assistant"s reply along with the model name
     return response.generations[0][0].text.strip()
