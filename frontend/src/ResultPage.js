@@ -45,13 +45,6 @@ const ResultPage = () => {
     fetchModelIds();
   }, []);
 
-  // Insert the question here
-  useEffect(() => {
-
-  // This is not ideal, but we have to disable it because for some reasons this page gets rendered twice. We have tried comparing with previous value, but nothing seems to work.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const editorRef = useRef();
 
   useEffect(() => {
@@ -109,7 +102,6 @@ const ResultPage = () => {
             </CardContent>
           </Card>
           {shuffleArray(modelIds).map((modelId, index) => (
-            // TODO: make everything camel case in the frontend.
             <AnswerCard
               key={modelId}
               index={index}

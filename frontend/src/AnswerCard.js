@@ -50,7 +50,6 @@ const AnswerCard = ({
       if (!questionId) {
         return;
       }
-      console.log("HAHAHAHA", index);
       try {
         const response = await fetch(resolveUrl('/api/answer'), {
           method: 'POST',
