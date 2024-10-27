@@ -346,13 +346,9 @@ async def get_answer_from_model():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/models/ids-to-names", methods=["GET"])
-def get_model_id_to_names():
-    id_to_name: dict[str, str] = {}
-    for _, models in config.LLM_DICT.items():
-        for model in models:
-            id_to_name[model.get("id")] = model.get("name")
-    return jsonify(id_to_name), 200
+@app.route("/api/models/ids", methods=["GET"])
+def get_model_ids():
+    return jsonify(list(config.LLM_CHAINS.keys())), 200
 
 @app.route("/health", methods=['GET'])
 def health():

@@ -11,10 +11,12 @@ import { resolveUrl, makeApiRequestAndCheckStatus } from './utils/api';
 import { LOADING_MESSAGES } from './utils/constants';
 import remarkGfm from 'remark-gfm';
 
+// Function to convert index to uppercase letter
+const indexToLetter = (index) => String.fromCharCode(65 + index);
+
 const AnswerCard = ({
   index,
   modelId,
-  modelName,
   taskDetails,
 }) => {
   const [answer, setAnswer] = useState(null);
@@ -60,7 +62,11 @@ const AnswerCard = ({
             task,
           }),
         });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch answer for model ${modelId}: ${response.status}`);
+        }
         const data = await response.json();
+
         const answer = {
           id: data.answer_id,
           model_id: data.model_id,
@@ -165,7 +171,7 @@ const AnswerCard = ({
     <Card elevation={3}>
       <CardContent>
         <Typography variant="h6" component="div">
-          {`Answer ${index + 1} (${modelName})`}
+          {`Answer ${index + 1} (Model ${indexToLetter(index)})`}
         </Typography>
         {!isLoaded &&
         <Box sx={{ display: "flex", alignItems: 'center' }}>

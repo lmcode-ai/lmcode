@@ -8,7 +8,7 @@ import AnswerCard from './AnswerCard';
 import { languageExtensions, defaultLanguage } from './code/constants';
 import { resolveUrl } from './utils/api';
 import { QUESTION_TITLE_TEXT } from './utils/constants';
-
+import { shuffleArray } from './utils/array';
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -26,19 +26,19 @@ const ResultPage = () => {
     throw new Error('Invalid code: ' + content);
   }
 
-  const [modelIdsToNames, setModelIdsToNames] = useState({});
+  const [modelIds, setModelIds] = useState([]);
 
   // Get all models
   useEffect(() => {
     const fetchModelIds = async () => {
-      const response = await fetch(resolveUrl('/api/models/ids-to-names'));
+      const response = await fetch(resolveUrl('/api/models/ids'));
 
       if (!response.ok) {
         throw new Error('Failed to fetch model IDs');
       }
 
-      const modelIdsToNames = await response.json();
-      setModelIdsToNames(modelIdsToNames);
+      const modelIds = await response.json();
+      setModelIds(modelIds);
     };
     fetchModelIds();
   }, []);
@@ -78,7 +78,7 @@ const ResultPage = () => {
 
   return (
     <Container>
-      <Box sx={{ mt: 4 }}>
+      <Box sx={{ my: 4 }}>
         <Stack
           direction="column"
           spacing={{ xs: 3, sm: 4, md: 5, lg: 6 }}
@@ -109,13 +109,12 @@ const ResultPage = () => {
               <div ref={editorRef} style={{ marginBottom: '16px', maxHeight: 'none' }} />
             </CardContent>
           </Card>
-          {Object.entries(modelIdsToNames).map(([modelId, modelName], index) => (
+          {shuffleArray(modelIds).map((modelId, index) => (
             // TODO: make everything camel case in the frontend.
             <AnswerCard
               key={modelId}
               index={index}
               modelId={modelId}
-              modelName={modelName}
               taskDetails={taskDetails}
             />
           ))}
