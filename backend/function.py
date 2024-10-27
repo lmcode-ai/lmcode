@@ -44,20 +44,27 @@ def insert_question(
     return question.id
 
 
-def insert_answer(content, model, question_id, order=-1) -> int:
+def insert_answer(
+    *,
+    content: str,
+    model_id: str,
+    question_id: int,
+    frontend_order: int
+) -> int:
     """
     Add an answer to the database
     :param content: the answer content
-    :param model: the model used to generate the answer
+    :param model: the model id used to generate the answer
     :param question_id: the id of the question
+    :param frontend_order: the order of the answer in the frontend
     :return: the id of the answer (primary key)
     """
 
     answer = Answer(
         content=content,
-        model=model,
+        model_id=model_id,
         question_id=question_id,
-        frontend_order=order,
+        frontend_order=frontend_order,
     )
 
     db.session.add(answer)
@@ -74,7 +81,21 @@ async def get_answer_from_model(
     target_language: str,
     task: str,
     question_id: int,
+    frontend_order: int
 ) -> dict[str, str]:
+    response: dict[str, str] = {}
+    response["model_name"] = "test"
+    response["model_id"] = model_id
+    response["content"] = content
+    answer_id = insert_answer(
+        content=content,
+        model_id=model_id,
+        question_id=question_id,
+        frontend_order=frontend_order
+    )
+    response["answer_id"] = answer_id
+    response["model_name"] = config.LLM_ID_NAME[model_id]
+    return response
     """
     Get answer from a specific model
     :param model_id: the id of the model

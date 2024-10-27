@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -33,6 +33,9 @@ const HomePage = () => {
   const [code, setCode] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [shouldNavigate, setShouldNavigate] = useState(false);
+  const [questionId, setQuestionId] = useState(null);
+  const [taskDetails, setTaskDetails] = useState(null);
   // const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const handleSubmit = async () => {
@@ -60,6 +63,7 @@ const HomePage = () => {
       targetLanguage,
       content: task === "Input/Output Examples" ? examplesString : code,
     }
+    setTaskDetails(taskDetails);
 
     // Insert the question into the database
     const insertQuestion = async () => {
@@ -75,14 +79,20 @@ const HomePage = () => {
         throw new Error('Failed to insert question');
       }
       const questionId = await response.json();
-      return questionId;
+      setQuestionId(questionId);
     };
-    const questionId = await insertQuestion();
+    await insertQuestion();
 
     // Navigate to the result page
-
-    navigate("/result", { state: { taskDetails, questionId } });
+    setShouldNavigate(true);
   };
+
+  useEffect(() => {
+    if (shouldNavigate) {
+      console.log('Navigating to result page with question ID:', questionId);
+      navigate('/result', { state: { questionId, taskDetails } });
+    }
+  }, [shouldNavigate, navigate, questionId, taskDetails]);
 
   const handleCloseDialog = () => {
     setOpenDialog(false);

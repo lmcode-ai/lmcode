@@ -260,7 +260,6 @@ def upsert_feedback():
 
 @app.route("/api/answer", methods=["POST"])
 async def get_answer():
-    return jsonify("test"), 200
     # TODO: add error handler to flask
     try:
         data = request.get_json()
@@ -301,6 +300,8 @@ async def get_answer():
         if question_id is None:
             return jsonify({"error": "question_id is missing"}), 400
 
+        frontend_order = data.get("frontendOrder")
+
         response = await get_answer_from_model(
             model_id=model_id,
             content=question_content,
@@ -309,6 +310,7 @@ async def get_answer():
             target_language=target_language,
             task=task,
             question_id=question_id,
+            frontend_order=frontend_order
         )
 
         logging.info(f"<handle_questions> llm response: {response}")

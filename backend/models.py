@@ -45,7 +45,7 @@ class Question(db.Model):
 class Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    model = db.Column(db.String, nullable=False)
+    model_id = db.Column(db.String, nullable=False)
     upvotes = db.Column(db.Integer, default=0)
     downvotes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)

@@ -50,6 +50,7 @@ const AnswerCard = ({
       if (!questionId) {
         return;
       }
+      console.log("HAHAHAHA", index);
       try {
         const response = await fetch(resolveUrl('/api/answer'), {
           method: 'POST',
@@ -65,6 +66,7 @@ const AnswerCard = ({
             sourceLanguage,
             targetLanguage,
             task,
+            frontendOrder: index,
           }),
         });
         if (!response.ok) {
@@ -88,7 +90,12 @@ const AnswerCard = ({
       }
     };
     fetchAnswer();
-  }, [modelId, taskDetails, questionId]);
+  }, [
+    index,
+    modelId,
+    questionId,
+    taskDetails,
+  ]);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleAccept = () => {
@@ -129,6 +136,12 @@ const AnswerCard = ({
       // If already rejected and toggled off, undo the reject
       makeApiRequestAndCheckStatus('/api/answers/unreject', 'POST', { answer_id: answer.id });
     }
+    const newAnswer = {
+      ...answer,
+      accepted: false,
+      rejected: !answer.rejected,
+    };
+    setAnswer(newAnswer);
   };
 
   const handleReportSubmit = (predefinedFeedbacks, textFeedback) => {
