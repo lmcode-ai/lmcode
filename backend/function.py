@@ -83,19 +83,6 @@ async def get_answer_from_model(
     question_id: int,
     frontend_order: int
 ) -> dict[str, str]:
-    response: dict[str, str] = {}
-    response["model_name"] = "test"
-    response["model_id"] = model_id
-    response["content"] = content
-    answer_id = insert_answer(
-        content=content,
-        model_id=model_id,
-        question_id=question_id,
-        frontend_order=frontend_order
-    )
-    response["answer_id"] = answer_id
-    response["model_name"] = config.LLM_ID_NAME[model_id]
-    return response
     """
     Get answer from a specific model
     :param model_id: the id of the model
@@ -139,6 +126,13 @@ async def get_answer_from_model(
     response["model_name"] = config.LLM_ID_NAME[model_id]
     response["model_id"] = model_id
     response["content"] = content
+    answer_id = insert_answer(
+        content=content,
+        model_id=model_id,
+        question_id=question_id,
+        frontend_order=frontend_order
+    )
+    response["answer_id"] = answer_id
     return response
 
 def update_answer(answer_id: int, upvote_change: int, downvote_change: int) -> None:

@@ -40,7 +40,7 @@ const ResultPage = () => {
       }
 
       const modelIds = await response.json();
-      setModelIds(modelIds);
+      setModelIds(shuffleArray(modelIds));
     };
     fetchModelIds();
   }, []);
@@ -101,7 +101,7 @@ const ResultPage = () => {
               <div ref={editorRef} style={{ marginBottom: '16px', maxHeight: 'none' }} />
             </CardContent>
           </Card>
-          {shuffleArray(modelIds).map((modelId, index) => (
+          {modelIds.map((modelId, index) => (
             <AnswerCard
               key={modelId}
               index={index}
