@@ -80,11 +80,21 @@ cd lmcode/frontend
 npm run build
 ```
 
-3. For backend, we are running the Flask application on port 5000 which is where Nginx is directing requests to.
+4. Backend currently relies on environment variable to use the proper app_config.ENV.yaml file. So we should set environment variable before running.
+
+```bash
+export FLASK_ENV=production
+```
+
+
+5. For backend, we are running the Flask application on port 5000 which is where Nginx is directing requests to.
 To make changes effective, run
 
 ```bash
 tmux attach -t backend # process running in tmux session 'backend'
+conda activate lmcode
 cd lmcode/backend
 flask run --host=127.0.0.1 --port=5000
+# To run with multiple workers:
+# gunicorn --workers 4 --bind 127.0.0.1:5000 app:app
 ```
