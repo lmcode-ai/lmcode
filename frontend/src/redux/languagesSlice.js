@@ -7,7 +7,9 @@ const initialState = {
     'C',
     'C++',
     'Javascript',
-    'Typescript'
+    'Typescript',
+    'Verilog',
+    'Scala'
   ]
 };
 
