@@ -20,6 +20,7 @@ import CodeEditor from './code/CodeEditor';
 import TaskDescription from './TaskDescription';
 import InstructionsCard from './InstructionsCard';
 import { QUESTION_TITLE_TEXT } from './utils/constants';
+import { resolveUrl } from './utils/api';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -47,11 +48,10 @@ const HomePage = () => {
       return;
     }
 
-    // Convert examples to a string format
+    // Join with double newlines for separation
     const examplesString = examples.map(example =>
       `Your input: ${example.input}\nYour output: ${example.output}`
-    ).join('\n\n'); // Join with double newlines for separation
-
+    ).join('\n\n');
     const taskDetails = {
       title,
       task,
@@ -59,10 +59,30 @@ const HomePage = () => {
       sourceLanguage,
       targetLanguage,
       content: task === "Input/Output Examples" ? examplesString : code,
-    };
+    }
 
-    navigate("/result", { state: { taskDetails } });
+    // Insert the question into the database
+    const insertQuestion = async () => {
+      const response = await fetch(resolveUrl('/api/question'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(taskDetails),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to insert question');
+      }
+      const questionId = await response.json();
+      return questionId;
+    };
+    const questionId = await insertQuestion();
+
+    // Navigate to the result page
+    navigate('/result', { state: { questionId, taskDetails } });
   };
+
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
