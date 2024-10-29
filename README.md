@@ -96,5 +96,5 @@ conda activate lmcode
 cd lmcode/backend
 flask run --host=127.0.0.1 --port=5000
 # To run with multiple workers:
-# gunicorn --workers 4 --bind 127.0.0.1:5000 app:app
+# gunicorn -k uvicorn.workers.UvicornWorker --workers 4 --bind 127.0.0.1:5000 app:asgi_app
 ```

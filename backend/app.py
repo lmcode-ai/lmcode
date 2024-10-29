@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from asgiref.wsgi import WsgiToAsgi
 from models import db, Language, Feedback
 import os
 from config import config
@@ -34,6 +35,7 @@ def create_app():
     return app
 
 app = create_app()
+asgi_app = WsgiToAsgi(app)
 
 @app.route("/api/health", methods=["GET"])
 def heath_check():
