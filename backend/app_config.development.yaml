@@ -16,14 +16,14 @@ llm:
       name: "GPT-4o"
       max_tokens: 5000
   anthropic:
-    - id: "claude-3-5-sonnet-20240620"
+    - id: "claude-3-5-sonnet-20241022"
       name: "Claude-3.5-sonnet"
       max_tokens: 5000
   hf:
     - id: "meta-llama/Llama-3.1-70B-Instruct"
       name: "Llama-3.1"
       max_tokens: 5000
-    - id: "Qwen/Qwen2.5-72B-Instruct"
+    - id: "Qwen/Qwen2.5-Coder-32B-Instruct"
       name: "Qwen2.5"
       max_tokens: 5000
   gemini:

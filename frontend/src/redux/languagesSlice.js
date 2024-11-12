@@ -9,7 +9,8 @@ const initialState = {
     'Javascript',
     'Typescript',
     'Verilog',
-    'Scala'
+    'Scala',
+    'Rust'
   ]
 };
 

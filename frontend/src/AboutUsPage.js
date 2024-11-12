@@ -30,8 +30,7 @@ const AboutUsPage = () => {
           About Us
         </Typography>
         <Typography variant="body1" paragraph>
-          Welcome to LMCode! LMCode is a platform for evaluating different large language models (LLMs) on various coding tasks.
-          If you have any questions or feedback, we'd love to hear from you!
+          Welcome to LMCode! Get instant solutions to your programming questions from multiple language models, each offering unique insights and approaches. Compare answers, explore different perspectives, and find the best fit for your needs—all without waiting for human replies.
         </Typography>
       </Box>
 
