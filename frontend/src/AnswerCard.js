@@ -281,7 +281,7 @@ const AnswerCard = ({
           >
             <IconButton
               color={answer?.rejected ? 'error' : 'default'}
-              onClick={() => setReportDialogOpen(true)}
+              onClick={() => answer?.rejected ? handleReject(): setReportDialogOpen(true)}
               sx={{ ml: 2, pb: 0 }}
             >
               <HighlightOffIcon />
