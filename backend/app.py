@@ -268,9 +268,6 @@ async def get_answer():
         model_id = data.get("modelId")
         if model_id is None:
             return jsonify({"error": "model_id is missing"}), 400
-        question_title = data.get("title")
-        if question_title is None:
-            return jsonify({"error": "question_title is missing"}), 400
 
         question_content = data.get("content")
         if question_content is None:
@@ -328,7 +325,7 @@ def get_model_ids():
 @app.route("/api/question", methods=["POST"])
 def add_question():
     data = request.get_json()
-    title = data.get("title")
+    title = "placeholder" # Placeholder for title suggestion.
     content = data.get("content")
     language = data.get("language")
     source_language = data.get("sourceLanguage")
@@ -336,8 +333,6 @@ def add_question():
     task = data.get("task")
     ip_address = request.remote_addr
 
-    if not title:
-        return jsonify({"error": "title is required"}), 400
     if not content:
         return jsonify({"error": "content is required"}), 400
     if not task:

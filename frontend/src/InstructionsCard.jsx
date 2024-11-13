@@ -4,7 +4,6 @@ import { Card, CardContent, Typography, List, ListItem, ListItemText, ListItemIc
 
 const InstructionsCard = () => {
   const instructions = [
-    { title: "Pick a Title", description: "" },
     { title: "Choose a Task", description: "Select from code completion, translation, repair, text-to-code, or summarization." },
     { title: "Pick a Language", description: "Choose your programming language, or enter natural language instructions." },
     { title: "Submit and Compare", description: "Watch as multiple chatbots tackle the task." },

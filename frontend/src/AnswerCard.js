@@ -36,7 +36,6 @@ const AnswerCard = ({
 
   useEffect(() => {
     const {
-      title,
       task,
       language,
       sourceLanguage,
@@ -59,7 +58,6 @@ const AnswerCard = ({
           body: JSON.stringify({
             questionId,
             modelId,
-            title,
             content,
             language,
             sourceLanguage,
