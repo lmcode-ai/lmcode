@@ -3,10 +3,10 @@ import React, { useState, useMemo } from 'react';
 const Leaderboard = () => {
     const data = useMemo(() => ([
         { id: 1, name: 'GPT-4o', votes: "-", rating: "-" },
-        { id: 2, name: 'Claude-3.5', votes: "-", rating: "-" },
+        { id: 2, name: 'Claude-3.5-sonnet', votes: "-", rating: "-" },
         { id: 3, name: 'Gemini-1.5-pro', votes: "-", rating: "-" },
         { id: 4, name: 'Llama-70b', votes: "-", rating: "-" },
-        { id: 5, name: 'Qwen 70b', votes: "-", rating: "-" },
+        { id: 5, name: 'Qwen2.5-Coder-32B', votes: "-", rating: "-" },
     ]), []);
     const [sortConfig, setSortConfig] = useState(null);
 
