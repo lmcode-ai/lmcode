@@ -36,11 +36,6 @@ const HomePage = () => {
   // const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const handleSubmit = async () => {
-    if (!title.trim()) {
-      setDialogMessage("Please enter a title before submitting.");
-      setOpenDialog(true);
-      return;
-    }
 
     if (!code.trim() && task !== "Input/Output Examples") {
       setDialogMessage("Please enter some code before submitting.");
@@ -53,7 +48,6 @@ const HomePage = () => {
       `Your input: ${example.input}\nYour output: ${example.output}`
     ).join('\n\n');
     const taskDetails = {
-      title,
       task,
       language,
       sourceLanguage,
@@ -145,15 +139,9 @@ const HomePage = () => {
             onError={handleGoogleLoginError}
           />
         </Box> */}
-        <TextField
-          label={QUESTION_TITLE_TEXT}
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <TaskSelection task={task} setTask={setTask} />
+        <Box sx={{ mt: 4 }} >
+          <TaskSelection task={task} setTask={setTask} />
+        </Box>
         <TaskDescription task={task} />
         <>
           {task === "Code Translation" ? (
